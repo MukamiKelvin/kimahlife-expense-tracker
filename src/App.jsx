@@ -4,6 +4,9 @@ import Navbar from "./components/Navbar";
 // Import the SummaryCard component.
 import SummaryCard from "./components/SummaryCard";
 
+// Import the ExpenseForm component.
+import ExpenseForm from "./components/ExpenseForm";
+
 // App is the main component of our application.
 function App() {
   return (
@@ -11,40 +14,47 @@ function App() {
       {/* Display our navigation bar */}
       <Navbar />
 
-      {/* Main content of our application */}
+      {/* Main content */}
       <main>
-        {/* Main dashboard heading */}
+
+        {/* Dashboard heading */}
         <h1>Financial Dashboard</h1>
 
-        {/* Short description */}
-        <p>Welcome to your personal expense tracker.</p>
+        {/* Description */}
+        <p>
+          Welcome to your PesaLens financial dashboard.
+        </p>
 
-        {/* Financial summary section */}
+        {/* Financial summary */}
         <section>
 
-          {/* Monthly income card */}
+          {/* Income */}
           <SummaryCard
             title="Monthly Income"
             amount="KSh 31,000"
           />
 
-          {/* Total expenses card */}
+          {/* Expenses */}
           <SummaryCard
             title="Total Expenses"
             amount="KSh 24,500"
           />
 
-          {/* Remaining balance card */}
+          {/* Balance */}
           <SummaryCard
             title="Balance"
             amount="KSh 6,500"
           />
 
         </section>
+
+        {/* Add expense form */}
+        <ExpenseForm />
+
       </main>
     </div>
   );
 }
 
-// Export App so React can render it.
+// Export App.
 export default App;
