@@ -277,83 +277,81 @@ function App() {
 
 
         {/* ==================================
-            CATEGORY ANALYSIS
-        ================================== */}
+    CATEGORY ANALYSIS
+================================== */}
 
-        <section>
+<section>
 
-          <h2>Spending by Category</h2>
+  <h2>Spending by Category</h2>
 
+  {Object.entries(categoryTotals).map(
+    ([category, total]) => {
 
-          {/* 
-            Object.entries() converts our category
-            totals object into an array.
-
-            Example:
-
-            {
-              Food: 5000,
-              Rent: 8500
-            }
-
-            becomes:
-
-            [
-              ["Food", 5000],
-              ["Rent", 8500]
-            ]
-
-            We can then use .map() to display
-            each category.
-          */}
-
-          {Object.entries(categoryTotals).map(
-            ([category, total]) => {
-
-              // Calculate what percentage of the
-              // month's spending belongs to this
-              // particular category.
-              //
-              // Example:
-              //
-              // Food = 5,000
-              // Monthly total = 20,000
-              //
-              // 5,000 / 20,000 * 100
-              // = 25%
-              const percentage =
-                monthlyTotal > 0
-                  ? (total / monthlyTotal) * 100
-                  : 0;
+      // Calculate what percentage of the
+      // month's total spending belongs to
+      // this category.
+      //
+      // Example:
+      // Shoes = 3,500
+      // Monthly spending = 3,500
+      //
+      // 3,500 / 3,500 * 100 = 100%
+      const spendingPercentage =
+        monthlyTotal > 0
+          ? (total / monthlyTotal) * 100
+          : 0;
 
 
-              // Return the category information.
-              return (
-                <div key={category}>
+      // Calculate what percentage of the
+      // user's monthly income was spent
+      // on this category.
+      //
+      // Example:
+      // Shoes = 3,500
+      // Income = 31,000
+      //
+      // 3,500 / 31,000 * 100 = 11.3%
+      const incomePercentage =
+        monthlyIncome > 0
+          ? (total / monthlyIncome) * 100
+          : 0;
 
-                  {/* Category name */}
-                  <p>
-                    <strong>{category}</strong>
-                  </p>
+
+      // Display the category information.
+      return (
+        <div key={category}>
+
+          {/* Category name */}
+          <p>
+            <strong>{category}</strong>
+          </p>
 
 
-                  {/* Amount spent */}
-                  <p>
-                    KSh {total.toLocaleString()}
-                  </p>
+          {/* Amount spent in this category */}
+          <p>
+            KSh {total.toLocaleString()}
+          </p>
 
 
-                  {/* Percentage of monthly spending */}
-                  <p>
-                    {percentage.toFixed(1)}% of monthly spending
-                  </p>
+          {/* Percentage of total monthly spending */}
+          <p>
+            {spendingPercentage.toFixed(1)}%
+            of monthly spending
+          </p>
 
-                </div>
-              );
-            }
-          )}
 
-        </section>
+          {/* Percentage of monthly income */}
+          <p>
+            {incomePercentage.toFixed(1)}%
+            of monthly income
+          </p>
+
+        </div>
+      );
+    }
+  )}
+
+</section>
 
 
         {/* ==================================
