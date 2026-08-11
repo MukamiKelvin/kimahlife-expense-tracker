@@ -49,10 +49,32 @@ section {
   gap: 20px;
 }
 
-/* Style each summary card */
+/* Style each financial summary card */
 section > div {
+  /* White card background */
   background-color: white;
+
+  /* Space inside the card */
   padding: 25px;
+
+  /* Rounded corners */
   border-radius: 10px;
+
+  /* Make sure the cards have enough width */
   min-width: 180px;
+
+  /* Make the cards slightly elevated */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Style the card title */
+section > div h3 {
+  margin-top: 0;
+  color: #6b7280;
+}
+
+/* Style the financial amount */
+section > div p {
+  font-size: 24px;
+  font-weight: bold;
 }

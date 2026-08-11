@@ -1,4 +1,4 @@
-// Import the Navbar component from our components folder.
+// Import the Navbar component.
 import Navbar from "./components/Navbar";
 
 // Import the SummaryCard component.
@@ -13,25 +13,38 @@ function App() {
 
       {/* Main content of our application */}
       <main>
+        {/* Main dashboard heading */}
         <h1>Financial Dashboard</h1>
 
+        {/* Short description */}
         <p>Welcome to your personal expense tracker.</p>
 
-        {/* Container for our financial summary */}
+        {/* Financial summary section */}
         <section>
-          {/* We can reuse the same component */}
-          <SummaryCard />
 
-          {/* Another SummaryCard */}
-          <SummaryCard />
+          {/* Monthly income card */}
+          <SummaryCard
+            title="Monthly Income"
+            amount="KSh 31,000"
+          />
 
-          {/* And another one */}
-          <SummaryCard />
+          {/* Total expenses card */}
+          <SummaryCard
+            title="Total Expenses"
+            amount="KSh 24,500"
+          />
+
+          {/* Remaining balance card */}
+          <SummaryCard
+            title="Balance"
+            amount="KSh 6,500"
+          />
+
         </section>
       </main>
     </div>
   );
 }
 
-// Export App so React can use it.
+// Export App so React can render it.
 export default App;

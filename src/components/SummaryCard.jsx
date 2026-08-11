@@ -1,18 +1,27 @@
 // SummaryCard is a reusable component.
-// We can use it multiple times for things like:
-// Income, Expenses and Balance.
-
-function SummaryCard() {
+// It receives information from its parent component
+// through something called "props".
+function SummaryCard({ title, amount }) {
   return (
     <div>
-      {/* The title of the card */}
-      <h3>Monthly Income</h3>
+      {/* 
+        Instead of writing "Monthly Income" directly,
+        we use the title prop.
 
-      {/* The amount */}
-      <p>KSh 31,000</p>
+        React will replace {title} with whatever
+        value we give the component.
+      */}
+      <h3>{title}</h3>
+
+      {/* 
+        We also use the amount prop.
+        This allows every card to display a
+        different financial amount.
+      */}
+      <p>{amount}</p>
     </div>
   );
 }
 
-// Export the component so other files can use it.
+// Export the component so App.jsx can use it.
 export default SummaryCard;
