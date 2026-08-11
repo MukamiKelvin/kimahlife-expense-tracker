@@ -18,6 +18,9 @@ import ExpenseList from "./components/ExpenseList";
 // Import the IncomeForm component.
 import IncomeForm from "./components/IncomeForm";
 
+// Import the SpendingChart component.
+import SpendingChart from "./components/SpendingChart";
+
 
 // App is the main component of PesaLens.
 function App() {
@@ -628,6 +631,15 @@ const incomeUsedPercentage =
   )}
 
 </section>
+
+
+{/* ==================================
+    SPENDING CHART
+================================== */}
+
+<SpendingChart
+  categoryTotals={categoryTotals}
+/>
 
    {/* ==================================
     FINANCIAL INSIGHT
