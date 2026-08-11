@@ -36,7 +36,7 @@ function App() {
 
   // Store the user's monthly income.
   // We start with KSh 31,000 for now.
-  const [monthlyIncome, setMonthlyIncome] = useState(31000);
+  const [monthlyIncome, setMonthlyIncome] = useState(50000);
 
 
   // ==========================================
@@ -116,6 +116,51 @@ function App() {
     {}
   );
 
+  // ==========================================
+// HIGHEST SPENDING CATEGORY
+// ==========================================
+
+// Convert the category totals object into an array
+// so that we can search through the categories.
+//
+// Example:
+//
+// {
+//   Food: 5000,
+//   Rent: 8500,
+//   Transport: 3000
+// }
+//
+// becomes:
+//
+// [
+//   ["Food", 5000],
+//   ["Rent", 8500],
+//   ["Transport", 3000]
+// ]
+
+const categoryEntries = Object.entries(categoryTotals);
+
+
+// Find the category with the highest spending.
+const highestCategory = categoryEntries.reduce(
+  (highest, current) => {
+
+    // current[1] represents the amount spent
+    // in the current category.
+    //
+    // highest[1] represents the amount spent
+    // in the current highest category.
+
+    if (current[1] > highest[1]) {
+      return current;
+    }
+
+    return highest;
+  },
+  ["None", 0]
+);
+
 
   // ==========================================
   // TOTAL EXPENSES
@@ -143,6 +188,23 @@ function App() {
 
   // Calculate the balance for the selected month.
   const monthlyBalance = monthlyIncome - monthlyTotal;
+
+  // ==========================================
+// INCOME USAGE
+// ==========================================
+
+// Calculate what percentage of the user's
+// monthly income has already been spent.
+//
+// Example:
+// Income = 31,000
+// Spending = 15,500
+//
+// 15,500 / 31,000 * 100 = 50%
+const incomeUsedPercentage =
+  monthlyIncome > 0
+    ? (monthlyTotal / monthlyIncome) * 100
+    : 0;
 
 
   // ==========================================
@@ -192,7 +254,7 @@ function App() {
         <h1>Financial Dashboard</h1>
 
         <p>
-          Welcome to your PesaLens financial dashboard.
+          Welcome to your KimSpend financial dashboard.
         </p>
 
 
@@ -275,6 +337,81 @@ function App() {
 
         </section>
 
+        {/* ==================================
+    INCOME USAGE
+================================== */}
+
+<section>
+
+  <h2>Income Usage</h2>
+
+  {/* Display monthly income */}
+  <p>
+    Monthly Income: KSh{" "}
+    {monthlyIncome.toLocaleString()}
+  </p>
+
+  {/* Display money spent */}
+  <p>
+    Money Spent: KSh{" "}
+    {monthlyTotal.toLocaleString()}
+  </p>
+
+  {/* Display percentage of income used */}
+  <p>
+    Income Used:{" "}
+    {incomeUsedPercentage.toFixed(1)}%
+  </p>
+
+  {/* Display remaining money */}
+  <p>
+    Remaining: KSh{" "}
+    {monthlyBalance.toLocaleString()}
+  </p>
+
+</section>
+
+  
+  {/* ==================================
+    INCOME USAGE INSIGHT
+================================== */}
+
+<section>
+
+  <h2>Income Insight</h2>
+
+  {incomeUsedPercentage > 100 ? (
+
+    <p>
+      🔴 You have spent more than your
+      monthly income.
+    </p>
+
+  ) : incomeUsedPercentage > 80 ? (
+
+    <p>
+      🚨 You have already used more than
+      80% of your monthly income.
+    </p>
+
+  ) : incomeUsedPercentage > 50 ? (
+
+    <p>
+      ⚠️ You have used more than half
+      of your monthly income.
+    </p>
+
+  ) : (
+
+    <p>
+      ✅ Your spending is currently
+      below 50% of your income.
+    </p>
+
+  )}
+
+</section>
+
 
         {/* ==================================
     CATEGORY ANALYSIS
@@ -350,6 +487,35 @@ function App() {
       );
     }
   )}
+
+</section>
+
+   {/* ==================================
+    FINANCIAL INSIGHT
+================================== */}
+
+<section>
+
+  <h2>💡 Financial Insight</h2>
+
+  <p>
+    Your highest spending category this month is:
+  </p>
+
+  <h3>
+    {highestCategory[0]}
+  </h3>
+
+  <p>
+    KSh {highestCategory[1].toLocaleString()}
+  </p>
+
+  <p>
+  {monthlyTotal > 0
+    ? ((highestCategory[1] / monthlyTotal) * 100).toFixed(1)
+    : 0
+  }% of your monthly spending
+</p>
 
 </section>
 

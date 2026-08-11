@@ -4,7 +4,7 @@ function Navbar() {
   return (
     <nav>
       {/* The name of our application */}
-      <h2>PesaLens</h2>
+      <h2>KimSpend</h2>
 
       {/* Navigation links */}
       <div>
