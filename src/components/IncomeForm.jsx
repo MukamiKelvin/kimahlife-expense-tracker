@@ -1,63 +1,149 @@
 // Import useState from React.
-// We use it to control the income input.
+// useState allows this component to remember
+// the income the user types.
 import { useState } from "react";
 
-// IncomeForm allows the user to enter
-// their monthly income.
-function IncomeForm({ setMonthlyIncome, currentIncome }) {
 
-  // Store whatever the user is currently
-  // typing into the income input.
-  const [income, setIncome] = useState("");
+// IncomeForm allows the user to set
+// or update their monthly income.
+function IncomeForm({
+  setMonthlyIncome,
+  currentIncome,
+}) {
 
-  // Handle the form submission.
+  // Store the value currently typed
+  // into the income input.
+  const [income, setIncome] = useState(
+    currentIncome
+  );
+
+
+  // Run when the form is submitted.
   function handleSubmit(event) {
 
-    // Prevent the browser from refreshing.
+    // Stop the browser from refreshing.
     event.preventDefault();
 
+
     // Convert the input from text to a number.
-    const incomeNumber = Number(income);
+    const newIncome = Number(income);
 
-    // Update the monthly income in App.
-    setMonthlyIncome(incomeNumber);
 
-    // Clear the input after saving.
-    setIncome("");
+    // Only update the income if
+    // the amount is greater than zero.
+    if (newIncome > 0) {
+
+      setMonthlyIncome(newIncome);
+
+    }
+
   }
 
+
   return (
-    <div>
 
-      {/* Form heading */}
-      <h2>Set Monthly Income</h2>
+    <div className="income-form-container">
 
-      <form onSubmit={handleSubmit}>
 
-        {/* Income input */}
-        <input
-          type="number"
-          placeholder="e.g. 31000"
+      {/* ==================================
+          FORM HEADER
+      ================================== */}
 
-          // Display the current input value.
-          value={income}
+      <div className="form-header">
 
-          // Update income whenever the user types.
-          onChange={(event) =>
-            setIncome(event.target.value)
-          }
-        />
+        <div>
+
+          <p className="form-eyebrow">
+            MONTHLY INCOME
+          </p>
+
+          <h2>
+            Manage Your Income
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      {/* ==================================
+          CURRENT INCOME
+      ================================== */}
+
+      <div className="current-income">
+
+        <span>
+          Current monthly income
+        </span>
+
+        <strong>
+          KSh {currentIncome.toLocaleString()}
+        </strong>
+
+      </div>
+
+
+      {/* ==================================
+          INCOME FORM
+      ================================== */}
+
+      <form
+        className="income-form"
+        onSubmit={handleSubmit}
+      >
+
+        <div className="form-group">
+
+          <label htmlFor="monthly-income">
+
+            New Monthly Income
+
+          </label>
+
+
+          <div className="amount-input">
+
+            <span>
+              KSh
+            </span>
+
+
+            <input
+              id="monthly-income"
+              type="number"
+              placeholder="e.g. 31000"
+              value={income}
+              onChange={(event) =>
+                setIncome(event.target.value)
+              }
+              min="1"
+              required
+            />
+
+          </div>
+
+        </div>
+
 
         {/* Submit button */}
-        <button type="submit">
-          Save Income
+
+        <button
+          type="submit"
+          className="primary-button"
+        >
+
+          Update Income
+
         </button>
 
       </form>
 
+
     </div>
+
   );
 }
 
-// Export the component.
+
+// Export IncomeForm.
 export default IncomeForm;

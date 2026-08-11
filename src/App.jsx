@@ -4,27 +4,39 @@
 // useEffect allows us to run code when something changes.
 import { useState, useEffect } from "react";
 
+
+// Import our main CSS file.
+import "./App.css";
+
+
 // Import the Navbar component.
 import Navbar from "./components/Navbar";
+
 
 // Import the SummaryCard component.
 import SummaryCard from "./components/SummaryCard";
 
+
 // Import the ExpenseForm component.
 import ExpenseForm from "./components/ExpenseForm";
+
 
 // Import the ExpenseList component.
 import ExpenseList from "./components/ExpenseList";
 
+
 // Import the IncomeForm component.
 import IncomeForm from "./components/IncomeForm";
+
 
 // Import the SpendingChart component.
 import SpendingChart from "./components/SpendingChart";
 
 
+
 // App is the main component of KimSpend.
 function App() {
+
 
   // ==========================================
   // EXPENSE STATE
@@ -44,6 +56,7 @@ function App() {
   });
 
 
+
   // ==========================================
   // SAVE EXPENSES
   // ==========================================
@@ -59,23 +72,24 @@ function App() {
   }, [expenses]);
 
 
+
   // ==========================================
   // EDITING EXPENSE STATE
   // ==========================================
 
-  // This state remembers the ID of the expense
-  // that the user wants to edit.
+  // Store the ID of the expense being edited.
   //
-  // null means that we are NOT editing anything.
+  // null means we are not currently editing.
   const [editingExpenseId, setEditingExpenseId] =
     useState(null);
+
 
 
   // ==========================================
   // MONTHLY INCOME STATE
   // ==========================================
 
-  // Load the user's saved monthly income.
+  // Load saved monthly income from localStorage.
   const [monthlyIncome, setMonthlyIncome] = useState(() => {
 
     const savedIncome =
@@ -85,14 +99,17 @@ function App() {
       return Number(savedIncome);
     }
 
+    // Default monthly income.
     return 31000;
   });
+
 
 
   // ==========================================
   // SAVE MONTHLY INCOME
   // ==========================================
 
+  // Save the income whenever it changes.
   useEffect(() => {
 
     localStorage.setItem(
@@ -101,6 +118,7 @@ function App() {
     );
 
   }, [monthlyIncome]);
+
 
 
   // ==========================================
@@ -121,10 +139,12 @@ function App() {
   });
 
 
+
   // ==========================================
   // SAVE SELECTED MONTH
   // ==========================================
 
+  // Remember the selected month after refresh.
   useEffect(() => {
 
     localStorage.setItem(
@@ -135,40 +155,52 @@ function App() {
   }, [selectedMonth]);
 
 
+
   // ==========================================
   // PREVIOUS MONTH
   // ==========================================
 
+  // Convert the selected month into a Date object.
   const currentMonthDate =
     new Date(`${selectedMonth}-01`);
 
+
+  // Create a Date representing the previous month.
   const previousMonthDate =
     new Date(currentMonthDate);
+
 
   previousMonthDate.setMonth(
     previousMonthDate.getMonth() - 1
   );
 
+
+  // Convert the previous month back into YYYY-MM.
   const previousMonth =
     previousMonthDate
       .toISOString()
       .slice(0, 7);
 
 
+
   // ==========================================
   // MONTHLY EXPENSES
   // ==========================================
 
+  // Get only expenses belonging to
+  // the selected month.
   const monthlyExpenses = expenses.filter(
     (expense) =>
       expense.date.startsWith(selectedMonth)
   );
 
 
+
   // ==========================================
   // PREVIOUS MONTH EXPENSES
   // ==========================================
 
+  // Get expenses belonging to the previous month.
   const previousMonthExpenses =
     expenses.filter(
       (expense) =>
@@ -176,16 +208,67 @@ function App() {
     );
 
 
+
   // ==========================================
   // MONTHLY TOTAL
   // ==========================================
 
+  // Calculate total spending for the selected month.
   const monthlyTotal =
     monthlyExpenses.reduce(
       (total, expense) =>
         total + expense.amount,
       0
     );
+
+
+
+  // ==========================================
+  // INCOME USAGE PERCENTAGE
+  // ==========================================
+
+  // Calculate what percentage of the selected
+  // month's income has already been spent.
+  //
+  // Example:
+  // Income = 31,000
+  // Spending = 18,500
+  // Usage = 59.7%
+  const incomeUsagePercentage =
+    monthlyIncome > 0
+      ? (monthlyTotal / monthlyIncome) * 100
+      : 0;
+
+
+
+  // ==========================================
+  // INCOME USAGE WIDTH
+  // ==========================================
+
+  // Limit the progress bar to 100%.
+  //
+  // This prevents the bar from becoming wider
+  // than the card when spending exceeds income.
+  const incomeUsageWidth =
+    Math.min(
+      incomeUsagePercentage,
+      100
+    );
+
+
+
+  // ==========================================
+  // INCOME USAGE STATUS
+  // ==========================================
+
+  // Decide which warning level to display.
+  const incomeUsageStatus =
+    incomeUsagePercentage > 100
+      ? "danger"
+      : incomeUsagePercentage > 80
+      ? "warning"
+      : "healthy";
+
 
 
   // ==========================================
@@ -200,12 +283,15 @@ function App() {
     );
 
 
+
   // ==========================================
   // SPENDING DIFFERENCE
   // ==========================================
 
+  // Compare this month with the previous month.
   const spendingDifference =
     monthlyTotal - previousMonthTotal;
+
 
 
   // ==========================================
@@ -218,36 +304,69 @@ function App() {
       : 0;
 
 
+
   // ==========================================
   // CATEGORY TOTALS
   // ==========================================
 
+  // Calculate how much was spent in each category.
   const categoryTotals =
     monthlyExpenses.reduce(
       (totals, expense) => {
 
         const category = expense.category;
 
+
+        // Create the category if it doesn't exist.
         if (!totals[category]) {
           totals[category] = 0;
         }
 
+
+        // Add the expense to the category.
         totals[category] += expense.amount;
 
-        return totals;
 
+        return totals;
       },
       {}
     );
+
+
+
+  // ==========================================
+  // CATEGORY ENTRIES
+  // ==========================================
+
+  // Convert categoryTotals into an array.
+  //
+  // Example:
+  //
+  // {
+  //   Food: 5000,
+  //   Shopping: 8000
+  // }
+  //
+  // becomes:
+  //
+  // [
+  //   ["Food", 5000],
+  //   ["Shopping", 8000]
+  // ]
+  //
+  // IMPORTANT:
+  // This is declared ONLY ONCE.
+  const categoryEntries =
+    Object.entries(categoryTotals);
+
 
 
   // ==========================================
   // HIGHEST SPENDING CATEGORY
   // ==========================================
 
-  const categoryEntries =
-    Object.entries(categoryTotals);
-
+  // Find the category where the user
+  // spent the most money.
   const highestCategory =
     categoryEntries.reduce(
       (highest, current) => {
@@ -257,22 +376,25 @@ function App() {
         }
 
         return highest;
-
       },
       ["None", 0]
     );
+
 
 
   // ==========================================
   // TOTAL EXPENSES
   // ==========================================
 
+  // Calculate total spending across
+  // all recorded expenses.
   const totalExpenses =
     expenses.reduce(
       (total, expense) =>
         total + expense.amount,
       0
     );
+
 
 
   // ==========================================
@@ -283,6 +405,7 @@ function App() {
     monthlyIncome - totalExpenses;
 
 
+
   // ==========================================
   // MONTHLY BALANCE
   // ==========================================
@@ -290,15 +413,6 @@ function App() {
   const monthlyBalance =
     monthlyIncome - monthlyTotal;
 
-
-  // ==========================================
-  // INCOME USAGE PERCENTAGE
-  // ==========================================
-
-  const incomeUsedPercentage =
-    monthlyIncome > 0
-      ? (monthlyTotal / monthlyIncome) * 100
-      : 0;
 
 
   // ==========================================
@@ -309,63 +423,58 @@ function App() {
     balance < 0;
 
 
+
   // ==========================================
-// START EDITING
-// ==========================================
+  // START EDITING
+  // ==========================================
 
-// This function runs when the user clicks
-// the Edit button.
-//
-// It remembers which expense the user
-// wants to edit.
-function handleEdit(expenseId) {
+  function handleEdit(expenseId) {
 
-  // Store the expense ID in our state.
-  setEditingExpenseId(expenseId);
+    setEditingExpenseId(expenseId);
 
-  // Show the ID in the console.
-  console.log(
-    "Editing expense:",
-    expenseId
-  );
-}
+    console.log(
+      "Editing expense:",
+      expenseId
+    );
+  }
 
-// ==========================================
-// UPDATE EXPENSE
-// ==========================================
 
-// This function receives the updated expense
-// from ExpenseForm.
-function handleUpdate(updatedExpense) {
 
-  // Go through all our expenses.
-  setExpenses((previousExpenses) =>
+  // ==========================================
+  // UPDATE EXPENSE
+  // ==========================================
 
-    previousExpenses.map((expense) => {
+  function handleUpdate(updatedExpense) {
 
-      // Check whether this is the expense
-      // that we are currently updating.
-      if (expense.id === updatedExpense.id) {
+    setExpenses(
+      (previousExpenses) =>
 
-        // Replace the old expense with
-        // the updated expense.
-        return updatedExpense;
-      }
+        previousExpenses.map(
+          (expense) => {
 
-      // Keep every other expense unchanged.
-      return expense;
-    })
-  );
+            if (
+              expense.id ===
+              updatedExpense.id
+            ) {
+              return updatedExpense;
+            }
 
-  // Exit editing mode.
-  setEditingExpenseId(null);
+            return expense;
+          }
+        )
+    );
 
-  // Show the updated expense in the console.
-  console.log(
-    "Expense updated:",
-    updatedExpense
-  );
-}
+
+    // Exit editing mode.
+    setEditingExpenseId(null);
+
+
+    console.log(
+      "Expense updated:",
+      updatedExpense
+    );
+  }
+
 
 
   // ==========================================
@@ -376,6 +485,7 @@ function handleUpdate(updatedExpense) {
 
     setExpenses(
       (previousExpenses) =>
+
         previousExpenses.filter(
           (expense) =>
             expense.id !== expenseId
@@ -384,47 +494,79 @@ function handleUpdate(updatedExpense) {
   }
 
 
+
   // ==========================================
   // DISPLAY APPLICATION
   // ==========================================
 
   return (
-    <div>
 
-      {/* Display the navigation bar */}
+    <div className="app">
+
+
+      {/* ==================================
+          NAVIGATION
+      ================================== */}
+
       <Navbar />
 
 
-      {/* Main content of KimSpend */}
-      <main>
+
+      {/* ==================================
+          MAIN DASHBOARD
+      ================================== */}
+
+      <main className="dashboard">
 
 
         {/* ==================================
-            DASHBOARD HEADING
+            DASHBOARD HEADER
         ================================== */}
 
-        <h1>Financial Dashboard</h1>
+        <header className="dashboard-header">
 
-        <p>
-          Welcome to your KimSpend financial dashboard.
-        </p>
+          <div>
+
+            <h1>
+              Financial Dashboard
+            </h1>
+
+            <p>
+              Understand where your money goes.
+            </p>
+
+          </div>
+
+        </header>
+
 
 
         {/* ==================================
             FINANCIAL SUMMARY
         ================================== */}
 
-        <section>
+        <section className="summary-grid">
+
+
+          {/* Monthly income */}
 
           <SummaryCard
             title="Monthly Income"
             amount={`KSh ${monthlyIncome.toLocaleString()}`}
           />
 
+
+
+          {/* Total expenses */}
+
           <SummaryCard
             title="Total Expenses"
             amount={`KSh ${totalExpenses.toLocaleString()}`}
           />
+
+
+
+          {/* Balance or deficit */}
 
           <SummaryCard
             title={
@@ -432,105 +574,244 @@ function handleUpdate(updatedExpense) {
                 ? "Deficit"
                 : "Balance"
             }
-            amount={`KSh ${Math.abs(balance).toLocaleString()}`}
+            amount={`KSh ${Math.abs(
+              balance
+            ).toLocaleString()}`}
           />
 
         </section>
 
-
-        {/* ==================================
-            MONTHLY OVERVIEW
-        ================================== */}
-
-        <section>
-
-          <h2>Monthly Overview</h2>
-
-          <label>
-            Select Month:
-          </label>
-
-          <input
-            type="month"
-            value={selectedMonth}
-            onChange={(event) =>
-              setSelectedMonth(
-                event.target.value
-              )
-            }
-          />
-
-          <p>
-            Selected Month: {selectedMonth}
-          </p>
-
-          <p>
-            Monthly Spending: KSh{" "}
-            {monthlyTotal.toLocaleString()}
-          </p>
-
-          <p>
-            Monthly Balance: KSh{" "}
-            {monthlyBalance.toLocaleString()}
-          </p>
-
-        </section>
 
 
         {/* ==================================
             INCOME USAGE
         ================================== */}
 
-        <section>
+        <section className="analytics-grid">
 
-          <h2>Income Usage</h2>
 
-          <p>
-            Monthly Income: KSh{" "}
-            {monthlyIncome.toLocaleString()}
-          </p>
+          <div className="income-usage-card">
 
-          <p>
-            Money Spent: KSh{" "}
-            {monthlyTotal.toLocaleString()}
-          </p>
 
-          <p>
-            Income Used:{" "}
-            {incomeUsedPercentage.toFixed(1)}%
-          </p>
+            {/* Card heading */}
 
-          <p>
-            Remaining: KSh{" "}
-            {monthlyBalance.toLocaleString()}
-          </p>
+            <div className="analytics-card-header">
+
+              <div>
+
+                <p className="form-eyebrow">
+                  INCOME USAGE
+                </p>
+
+                <h2>
+                  Spending Progress
+                </h2>
+
+              </div>
+
+
+              {/* Percentage */}
+
+              <strong
+                className={`usage-percentage ${incomeUsageStatus}`}
+              >
+                {incomeUsagePercentage.toFixed(1)}%
+              </strong>
+
+            </div>
+
+
+
+            {/* Spending information */}
+
+            <div className="usage-information">
+
+              <span>
+                KSh {monthlyTotal.toLocaleString()} spent
+              </span>
+
+              <span>
+                KSh {monthlyIncome.toLocaleString()} income
+              </span>
+
+            </div>
+
+
+
+            {/* Progress bar */}
+
+            <div className="progress-bar">
+
+              <div
+                className={`progress-fill ${incomeUsageStatus}`}
+                style={{
+                  width: `${incomeUsageWidth}%`,
+                }}
+              ></div>
+
+            </div>
+
+
+
+            {/* Status message */}
+
+            <p
+              className={`usage-message ${incomeUsageStatus}`}
+            >
+
+              {incomeUsagePercentage > 100
+                ? "You have exceeded your monthly income."
+                : incomeUsagePercentage > 80
+                ? "Your spending is getting high. Watch your remaining balance."
+                : "Your spending is currently within a healthy range."
+              }
+
+            </p>
+
+
+          </div>
 
         </section>
+
+
+
+        {/* ==================================
+    MONTHLY OVERVIEW
+================================== */}
+
+<section className="dashboard-section monthly-overview">
+
+  {/* Section heading */}
+  <div className="section-header">
+
+    <div>
+      <p className="form-eyebrow">
+        MONTHLY ANALYSIS
+      </p>
+
+      <h2>
+        Monthly Overview
+      </h2>
+
+      <p className="section-description">
+        Track your spending and remaining balance for the selected month.
+      </p>
+    </div>
+
+    {/* Month selector */}
+    <div className="month-selector">
+
+      <label htmlFor="month">
+        Select Month
+      </label>
+
+      <input
+        id="month"
+        type="month"
+        value={selectedMonth}
+        onChange={(event) =>
+          setSelectedMonth(event.target.value)
+        }
+      />
+
+    </div>
+
+  </div>
+
+
+  {/* Monthly statistics */}
+
+  <div className="monthly-stats">
+
+    {/* Selected month */}
+
+    <div className="monthly-stat">
+
+      <span className="stat-label">
+        Selected Month
+      </span>
+
+      <strong>
+        {new Date(
+          `${selectedMonth}-01`
+        ).toLocaleDateString("en-US", {
+          month: "long",
+          year: "numeric",
+        })}
+      </strong>
+
+    </div>
+
+
+    {/* Monthly spending */}
+
+    <div className="monthly-stat">
+
+      <span className="stat-label">
+        Monthly Spending
+      </span>
+
+      <strong>
+        KSh {monthlyTotal.toLocaleString()}
+      </strong>
+
+    </div>
+
+
+    {/* Monthly balance */}
+
+    <div
+      className={`monthly-stat ${
+        monthlyBalance < 0
+          ? "stat-danger"
+          : "stat-positive"
+      }`}
+    >
+
+      <span className="stat-label">
+        Remaining Balance
+      </span>
+
+      <strong>
+        KSh {monthlyBalance.toLocaleString()}
+      </strong>
+
+    </div>
+
+  </div>
+
+</section>
+
 
 
         {/* ==================================
             INCOME INSIGHT
         ================================== */}
 
-        <section>
+        <section className="dashboard-section">
 
-          <h2>Income Insight</h2>
 
-          {incomeUsedPercentage > 100 ? (
+          <h2>
+            Income Insight
+          </h2>
+
+
+
+          {incomeUsagePercentage > 100 ? (
 
             <p>
               🔴 You have spent more than
               your monthly income.
             </p>
 
-          ) : incomeUsedPercentage > 80 ? (
+          ) : incomeUsagePercentage > 80 ? (
 
             <p>
               🚨 You have used more than
               80% of your monthly income.
             </p>
 
-          ) : incomeUsedPercentage > 50 ? (
+          ) : incomeUsagePercentage > 50 ? (
 
             <p>
               ⚠️ You have used more than
@@ -549,270 +830,612 @@ function handleUpdate(updatedExpense) {
         </section>
 
 
-        {/* ==================================
-            MONTHLY COMPARISON
-        ================================== */}
-
-        <section>
-
-          <h2>Monthly Comparison</h2>
-
-          <p>
-            Previous Month Spending:
-            KSh{" "}
-            {previousMonthTotal.toLocaleString()}
-          </p>
-
-          <p>
-            Current Month Spending:
-            KSh{" "}
-            {monthlyTotal.toLocaleString()}
-          </p>
-
-          <p>
-            Difference:
-            KSh{" "}
-            {Math.abs(
-              spendingDifference
-            ).toLocaleString()}
-          </p>
-
-          <p>
-            Percentage Change:{" "}
-            {Math.abs(
-              spendingPercentageChange
-            ).toFixed(1)}%
-          </p>
-
-          {previousMonthTotal === 0 ? (
-
-            <p>
-              ℹ️ There is no spending data
-              for the previous month yet.
-            </p>
-
-          ) : spendingDifference > 0 ? (
-
-            <p>
-              📈 You spent{" "}
-              {Math.abs(
-                spendingPercentageChange
-              ).toFixed(1)}%
-              more this month than last month.
-            </p>
-
-          ) : spendingDifference < 0 ? (
-
-            <p>
-              📉 You spent{" "}
-              {Math.abs(
-                spendingPercentageChange
-              ).toFixed(1)}%
-              less this month than last month.
-            </p>
-
-          ) : (
-
-            <p>
-              ➖ Your spending is the same
-              as last month.
-            </p>
-
-          )}
-
-        </section>
-
 
         {/* ==================================
-            CATEGORY ANALYSIS
-        ================================== */}
+    MONTHLY COMPARISON
+================================== */}
 
-        <section>
+<section className="dashboard-section monthly-comparison">
 
-          <h2>Spending by Category</h2>
+  {/* Section header */}
+  <div className="section-header">
 
-          {Object.entries(categoryTotals).map(
-            ([category, total]) => {
+    <div>
 
-              const spendingPercentage =
-                monthlyTotal > 0
-                  ? (total / monthlyTotal) * 100
-                  : 0;
+      <p className="form-eyebrow">
+        SPENDING TREND
+      </p>
 
-              const incomePercentage =
-                monthlyIncome > 0
-                  ? (total / monthlyIncome) * 100
-                  : 0;
+      <h2>
+        Monthly Comparison
+      </h2>
 
-              return (
-                <div key={category}>
+      <p className="section-description">
+        Compare your spending with the previous month.
+      </p>
 
-                  <p>
-                    <strong>
-                      {category}
-                    </strong>
-                  </p>
+    </div>
 
-                  <p>
-                    KSh{" "}
-                    {total.toLocaleString()}
-                  </p>
+  </div>
 
-                  <p>
-                    {spendingPercentage.toFixed(1)}%
-                    of monthly spending
-                  </p>
 
-                  <p>
-                    {incomePercentage.toFixed(1)}%
-                    of monthly income
-                  </p>
+  {/* Comparison statistics */}
+
+  <div className="comparison-grid">
+
+    {/* Previous month */}
+
+    <div className="comparison-stat">
+
+      <span className="stat-label">
+        Previous Month
+      </span>
+
+      <strong>
+        KSh {previousMonthTotal.toLocaleString()}
+      </strong>
+
+    </div>
+
+
+    {/* Current month */}
+
+    <div className="comparison-stat">
+
+      <span className="stat-label">
+        Current Month
+      </span>
+
+      <strong>
+        KSh {monthlyTotal.toLocaleString()}
+      </strong>
+
+    </div>
+
+
+    {/* Difference */}
+
+    <div
+      className={`comparison-stat ${
+        spendingDifference > 0
+          ? "comparison-danger"
+          : spendingDifference < 0
+          ? "comparison-positive"
+          : ""
+      }`}
+    >
+
+      <span className="stat-label">
+        Difference
+      </span>
+
+      <strong>
+
+        {spendingDifference > 0
+          ? "+"
+          : spendingDifference < 0
+          ? "-"
+          : ""}
+
+        KSh{" "}
+        {Math.abs(
+          spendingDifference
+        ).toLocaleString()}
+
+      </strong>
+
+    </div>
+
+
+    {/* Percentage change */}
+
+    <div
+      className={`comparison-stat ${
+        spendingDifference > 0
+          ? "comparison-danger"
+          : spendingDifference < 0
+          ? "comparison-positive"
+          : ""
+      }`}
+    >
+
+      <span className="stat-label">
+        Percentage Change
+      </span>
+
+      <strong>
+
+        {spendingPercentageChange > 0
+          ? "+"
+          : spendingPercentageChange < 0
+          ? "-"
+          : ""}
+
+        {Math.abs(
+          spendingPercentageChange
+        ).toFixed(1)}%
+
+      </strong>
+
+    </div>
+
+  </div>
+
+
+  {/* Comparison insight */}
+
+  <div className="comparison-insight">
+
+    {previousMonthTotal === 0 ? (
+
+      <p className="comparison-neutral">
+        ℹ️ There is no spending data for the
+        previous month yet.
+      </p>
+
+    ) : spendingDifference > 0 ? (
+
+      <p className="comparison-danger-text">
+        📈 You spent{" "}
+        {Math.abs(
+          spendingPercentageChange
+        ).toFixed(1)}%
+        more this month than last month.
+      </p>
+
+    ) : spendingDifference < 0 ? (
+
+      <p className="comparison-positive-text">
+        📉 You spent{" "}
+        {Math.abs(
+          spendingPercentageChange
+        ).toFixed(1)}%
+        less this month than last month.
+      </p>
+
+    ) : (
+
+      <p className="comparison-neutral">
+        ➖ Your spending is the same as last month.
+      </p>
+
+    )}
+
+  </div>
+
+</section>
+
+
+
+       {/* ==================================
+    CATEGORY ANALYSIS
+================================== */}
+
+<section className="dashboard-section category-analysis">
+
+  {/* Section header */}
+  <div className="section-header">
+
+    <div>
+
+      <p className="form-eyebrow">
+        SPENDING BREAKDOWN
+      </p>
+
+      <h2>
+        Spending by Category
+      </h2>
+
+      <p className="section-description">
+        See where most of your money is going this month.
+      </p>
+
+    </div>
+
+  </div>
+
+
+  {/* Category cards */}
+
+  {categoryEntries.length > 0 ? (
+
+    <div className="category-grid">
+
+      {categoryEntries.map(
+        ([category, total]) => {
+
+          // Percentage of monthly spending.
+          const spendingPercentage =
+            monthlyTotal > 0
+              ? (total / monthlyTotal) * 100
+              : 0;
+
+
+          // Percentage of monthly income.
+          const incomePercentage =
+            monthlyIncome > 0
+              ? (total / monthlyIncome) * 100
+              : 0;
+
+
+          return (
+
+            <div
+              className="category-card"
+              key={category}
+            >
+
+              {/* Category heading */}
+
+              <div className="category-card-header">
+
+                <div>
+
+                  <span className="category-name">
+                    {category}
+                  </span>
+
+                  <span className="category-amount">
+                    KSh {total.toLocaleString()}
+                  </span>
 
                 </div>
-              );
-            }
-          )}
 
-        </section>
+                <strong>
+                  {spendingPercentage.toFixed(1)}%
+                </strong>
+
+              </div>
+
+
+              {/* Spending progress */}
+
+              <div className="category-progress">
+
+                <div
+                  className="category-progress-fill"
+                  style={{
+                    width: `${spendingPercentage}%`,
+                  }}
+                ></div>
+
+              </div>
+
+
+              {/* Category information */}
+
+              <div className="category-card-footer">
+
+                <span>
+                  {spendingPercentage.toFixed(1)}%
+                  of spending
+                </span>
+
+                <span>
+                  {incomePercentage.toFixed(1)}%
+                  of income
+                </span>
+
+              </div>
+
+            </div>
+
+          );
+        }
+      )}
+
+    </div>
+
+  ) : (
+
+    /* Empty category state */
+
+    <div className="category-empty">
+
+      <div className="category-empty-icon">
+        —
+      </div>
+
+      <h3>
+        No spending yet
+      </h3>
+
+      <p>
+        Add an expense to see your spending
+        breakdown by category.
+      </p>
+
+    </div>
+
+  )}
+
+</section>
+
 
 
         {/* ==================================
             SPENDING CHART
         ================================== */}
 
-        <SpendingChart
-          categoryTotals={categoryTotals}
-        />
+        <section className="dashboard-section">
+
+
+          <SpendingChart
+            categoryTotals={
+              categoryTotals
+            }
+          />
+
+
+        </section>
+
 
 
         {/* ==================================
-            FINANCIAL INSIGHT
-        ================================== */}
+    FINANCIAL INSIGHT
+================================== */}
 
-        <section>
+<section className="dashboard-section financial-insight">
 
-          <h2>
-            💡 Financial Insight
-          </h2>
+  {/* Insight header */}
+  <div className="financial-insight-header">
 
-          <p>
-            Your highest spending category
-            this month is:
-          </p>
+    <div>
+      <p className="form-eyebrow">
+        SMART INSIGHT
+      </p>
 
-          <h3>
-            {highestCategory[0]}
-          </h3>
+      <h2>
+        Financial Insight
+      </h2>
+    </div>
 
-          <p>
-            KSh{" "}
-            {highestCategory[1].toLocaleString()}
-          </p>
+    <div className="insight-icon">
+      💡
+    </div>
 
-          <p>
-            {monthlyTotal > 0
-              ? (
-                  (highestCategory[1] /
-                    monthlyTotal) *
-                  100
-                ).toFixed(1)
-              : 0
-            }%
-            of your monthly spending
-          </p>
+  </div>
 
-        </section>
+
+  {/* Main insight */}
+
+  <div className="insight-main">
+
+    <p>
+      Your highest spending category
+      this month is
+    </p>
+
+    <h3>
+      {highestCategory[0]}
+    </h3>
+
+    <strong className="insight-amount">
+      KSh {highestCategory[1].toLocaleString()}
+    </strong>
+
+    <p className="insight-percentage">
+
+      {monthlyTotal > 0
+        ? (
+            (highestCategory[1] /
+              monthlyTotal) *
+            100
+          ).toFixed(1)
+        : 0
+      }%
+
+      {" "}of your monthly spending
+
+    </p>
+
+  </div>
+
+
+  {/* Insight message */}
+
+  <div className="insight-message">
+
+    {highestCategory[1] === 0 ? (
+
+      <p>
+        📝 Start recording your expenses
+        and KimSpend will generate
+        personalized insights for you.
+      </p>
+
+    ) : highestCategory[1] >
+      monthlyIncome * 0.3 ? (
+
+      <p>
+        ⚠️ <strong>
+          {highestCategory[0]}
+        </strong>{" "}
+        is taking up a significant
+        portion of your income.
+        Consider reviewing this category.
+      </p>
+
+    ) : highestCategory[1] >
+      monthlyIncome * 0.2 ? (
+
+      <p>
+        💡 Your{" "}
+        <strong>
+          {highestCategory[0]}
+        </strong>{" "}
+        spending is worth monitoring.
+        It represents a noticeable part
+        of your monthly income.
+      </p>
+
+    ) : (
+
+      <p>
+        ✅ Your highest spending category
+        is currently within a reasonable
+        portion of your income.
+      </p>
+
+    )}
+
+  </div>
+
+
+  {/* Financial stats */}
+
+  <div className="insight-stats">
+
+    <div className="insight-stat">
+
+      <span>
+        Category Spending
+      </span>
+
+      <strong>
+        KSh {highestCategory[1].toLocaleString()}
+      </strong>
+
+    </div>
+
+
+    <div className="insight-stat">
+
+      <span>
+        Monthly Spending
+      </span>
+
+      <strong>
+        KSh {monthlyTotal.toLocaleString()}
+      </strong>
+
+    </div>
+
+
+    <div className="insight-stat">
+
+      <span>
+        Remaining Income
+      </span>
+
+      <strong>
+        KSh {Math.max(
+          monthlyBalance,
+          0
+        ).toLocaleString()}
+      </strong>
+
+    </div>
+
+  </div>
+
+</section>
+
 
 
         {/* ==================================
             INCOME FORM
         ================================== */}
 
-        <IncomeForm
-          setMonthlyIncome={
-            setMonthlyIncome
-          }
-          currentIncome={
-            monthlyIncome
-          }
-        />
+        <section className="dashboard-section">
+
+
+          <IncomeForm
+            setMonthlyIncome={
+              setMonthlyIncome
+            }
+
+            currentIncome={
+              monthlyIncome
+            }
+          />
+
+
+        </section>
+
 
 
         {/* ==================================
             EXPENSE FORM
         ================================== */}
 
-       <ExpenseForm
-  // Used when adding a new expense.
-  setExpenses={setExpenses}
+        <section className="dashboard-section">
 
-  // Find the expense currently being edited.
-  editingExpense={
-    expenses.find(
-      (expense) =>
-        expense.id === editingExpenseId
-    )
-  }
 
-  // Function used by ExpenseForm
-  // to update the expense.
-  onUpdate={handleUpdate}
+          <ExpenseForm
 
-  // Function used to cancel editing.
-  onCancelEdit={() =>
-    setEditingExpenseId(null)
-  }
-/>
+            // Used when adding a new expense.
+            setExpenses={
+              setExpenses
+            }
+
+
+            // Find the expense currently
+            // being edited.
+            editingExpense={
+              expenses.find(
+                (expense) =>
+                  expense.id ===
+                  editingExpenseId
+              )
+            }
+
+
+            // Function used to update
+            // an existing expense.
+            onUpdate={
+              handleUpdate
+            }
+
+
+            // Function used to cancel editing.
+            onCancelEdit={() =>
+              setEditingExpenseId(null)
+            }
+
+          />
+
+
+        </section>
+
 
 
         {/* ==================================
             EXPENSE LIST
         ================================== */}
 
-        <ExpenseList
-          expenses={expenses}
-          onDelete={handleDelete}
-
-          // Pass our handleEdit function
-          // down to ExpenseList.
-          onEdit={handleEdit}
-        />
+        <section className="dashboard-section">
 
 
-        {/* ==================================
-            EDITING INFORMATION
-        ================================== */}
+          <ExpenseList
 
-        {/* 
-          This is temporary.
+            expenses={
+              expenses
+            }
 
-          We are displaying the ID of the
-          expense currently being edited.
+            onDelete={
+              handleDelete
+            }
 
-          Later, we will replace this with
-          an actual edit form.
-        */}
-        {editingExpenseId && (
-          <section>
+            onEdit={
+              handleEdit
+            }
 
-            <h2>
-              Editing Expense
-            </h2>
+          />
 
-            <p>
-              Expense ID: {editingExpenseId}
-            </p>
 
-          </section>
-        )}
+        </section>
+
 
 
       </main>
+
 
     </div>
   );
 }
 
 
-// Export App so main.jsx can use it.
+
+// Export App so main.jsx can render it.
 export default App;

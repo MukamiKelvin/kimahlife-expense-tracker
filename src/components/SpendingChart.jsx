@@ -1,112 +1,207 @@
-// SpendingChart receives categoryTotals
-// from App.jsx.
+// SpendingChart displays a visual breakdown
+// of the user's spending by category.
 //
-// categoryTotals contains the amount spent
-// in each category.
+// categoryTotals is received from App.jsx.
+// Example:
+//
+// {
+//   Food: 5000,
+//   Transport: 3000,
+//   Shopping: 3500
+// }
+
 function SpendingChart({ categoryTotals }) {
 
   // Convert the category totals object
-  // into an array that we can loop through.
-  //
-  // Example:
-  //
-  // {
-  //   Food: 5000,
-  //   Rent: 8500
-  // }
-  //
-  // becomes:
-  //
-  // [
-  //   ["Food", 5000],
-  //   ["Rent", 8500]
-  // ]
-  const categories = Object.entries(categoryTotals);
+  // into an array so we can use map().
+  const categoryEntries = Object.entries(categoryTotals);
 
+  // Calculate the total amount spent.
+  const totalSpending = categoryEntries.reduce(
+    (total, [, amount]) => total + amount,
+    0
+  );
+
+  // Find the highest spending category.
+  const highestCategory = categoryEntries.reduce(
+    (highest, current) => {
+      if (current[1] > highest[1]) {
+        return current;
+      }
+
+      return highest;
+    },
+    ["None", 0]
+  );
+
+  // If there are no expenses yet,
+  // show an empty state.
+  if (categoryEntries.length === 0) {
+    return (
+      <div className="spending-chart-container">
+
+        <div className="spending-chart-header">
+          <div>
+            <p className="form-eyebrow">
+              SPENDING ANALYSIS
+            </p>
+
+            <h2>Spending Chart</h2>
+          </div>
+        </div>
+
+        <div className="spending-chart-empty">
+          <div className="empty-chart-icon">
+            $
+          </div>
+
+          <h3>No spending data yet</h3>
+
+          <p>
+            Add some expenses to see your
+            spending breakdown.
+          </p>
+        </div>
+
+      </div>
+    );
+  }
 
   return (
-    <section>
+    <div className="spending-chart-container">
 
-      <h2>Spending Chart</h2>
+      {/* ==================================
+          CHART HEADER
+      ================================== */}
 
+      <div className="spending-chart-header">
 
-      {/* 
-        Loop through every category
-        and create a visual bar.
-      */}
-      {categories.map(([category, amount]) => {
+        <div>
+          <p className="form-eyebrow">
+            SPENDING ANALYSIS
+          </p>
 
-        // Find the highest spending amount.
-        //
-        // We use Math.max() to find the
-        // largest number in our categories.
-        const highestAmount = Math.max(
-          ...categories.map(
-            ([, amount]) => amount
-          )
-        );
+          <h2>
+            Spending by Category
+          </h2>
+        </div>
 
+        <div className="chart-total">
 
-        // Calculate the width of the bar.
-        //
-        // The category with the highest amount
-        // will have a width of 100%.
-        const barWidth =
-          highestAmount > 0
-            ? (amount / highestAmount) * 100
-            : 0;
+          <span>Total Spent</span>
 
+          <strong>
+            KSh {totalSpending.toLocaleString()}
+          </strong>
 
-        return (
-          <div key={category}>
+        </div>
 
-            {/* Category name */}
-            <p>
-              <strong>{category}</strong>
-            </p>
+      </div>
 
 
-            {/* 
-              The outer div represents
-              the entire chart bar.
-            */}
-            <div
-              style={{
-                width: "100%",
-                height: "20px",
-                backgroundColor: "#e5e7eb",
-              }}
-            >
+      {/* ==================================
+          HIGHEST CATEGORY
+      ================================== */}
 
-              {/* 
-                This inner div represents
-                the amount spent.
-              */}
+      <div className="highest-category">
+
+        <div className="highest-category-icon">
+          ↑
+        </div>
+
+        <div>
+
+          <span>
+            Highest Spending
+          </span>
+
+          <strong>
+            {highestCategory[0]}
+          </strong>
+
+        </div>
+
+        <strong className="highest-category-amount">
+          KSh {highestCategory[1].toLocaleString()}
+        </strong>
+
+      </div>
+
+
+      {/* ==================================
+          CATEGORY BARS
+      ================================== */}
+
+      <div className="category-chart">
+
+        {categoryEntries.map(
+          ([category, amount]) => {
+
+            // Calculate the percentage
+            // this category represents
+            // of total spending.
+            const percentage =
+              totalSpending > 0
+                ? (amount / totalSpending) * 100
+                : 0;
+
+            return (
               <div
-                style={{
-                  width: `${barWidth}%`,
-                  height: "100%",
-                  backgroundColor: "#2563eb",
-                }}
+                className="category-chart-item"
+                key={category}
               >
+
+                {/* Category information */}
+
+                <div className="category-chart-info">
+
+                  <div className="category-chart-name">
+                    <span className="category-dot"></span>
+
+                    <strong>
+                      {category}
+                    </strong>
+                  </div>
+
+                  <div className="category-chart-values">
+
+                    <span>
+                      KSh {amount.toLocaleString()}
+                    </span>
+
+                    <strong>
+                      {percentage.toFixed(1)}%
+                    </strong>
+
+                  </div>
+
+                </div>
+
+
+                {/* Progress bar */}
+
+                <div className="category-bar">
+
+                  <div
+                    className="category-bar-fill"
+                    style={{
+                      width: `${percentage}%`,
+                    }}
+                  ></div>
+
+                </div>
+
               </div>
+            );
+          }
+        )}
 
-            </div>
+      </div>
 
-
-            {/* Display the amount */}
-            <p>
-              KSh {amount.toLocaleString()}
-            </p>
-
-          </div>
-        );
-      })}
-
-    </section>
+    </div>
   );
 }
 
 
-// Export the component.
+// Export SpendingChart.
 export default SpendingChart;

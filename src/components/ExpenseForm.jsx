@@ -1,19 +1,11 @@
-// Import useState and useEffect from React.
-//
-// useState allows our component to remember information.
-// useEffect allows us to run code when editingExpense changes.
-import { useState, useEffect } from "react";
+// Import useState from React.
+import { useState } from "react";
 
 
-// ExpenseForm can perform TWO actions:
+// ExpenseForm collects information about
+// a new expense from the user.
 //
-// 1. Add a new expense.
-// 2. Edit an existing expense.
-//
-// setExpenses = adds a new expense.
-// editingExpense = expense currently being edited.
-// onUpdate = updates an existing expense.
-// onCancelEdit = cancels editing mode.
+// It can also be used to edit an existing expense.
 function ExpenseForm({
   setExpenses,
   editingExpense,
@@ -21,227 +13,76 @@ function ExpenseForm({
   onCancelEdit,
 }) {
 
-
-  // ==========================================
-  // FORM STATE
-  // ==========================================
-
   // Store the expense name.
-  const [name, setName] = useState("");
-
+  const [name, setName] = useState(
+    editingExpense ? editingExpense.name : ""
+  );
 
   // Store the expense amount.
-  const [amount, setAmount] = useState("");
+  const [amount, setAmount] = useState(
+    editingExpense ? editingExpense.amount : ""
+  );
 
-
-  // Store the expense category.
-  const [category, setCategory] = useState("Food");
-
+  // Store the selected category.
+  const [category, setCategory] = useState(
+    editingExpense
+      ? editingExpense.category
+      : "Food"
+  );
 
   // Store the expense date.
-  const [date, setDate] = useState("");
+  const [date, setDate] = useState(
+    editingExpense ? editingExpense.date : ""
+  );
 
 
-  // Store validation error messages.
-  //
-  // If there is no error, this will be empty.
-  const [error, setError] = useState("");
-
-
-  // ==========================================
-  // LOAD EXPENSE INTO FORM
-  // ==========================================
-
-  // When the user clicks Edit,
-  // load the selected expense into the form.
-  useEffect(() => {
-
-    if (editingExpense) {
-
-      // Load expense name.
-      setName(editingExpense.name);
-
-      // Load expense amount.
-      setAmount(
-        String(editingExpense.amount)
-      );
-
-      // Load expense category.
-      setCategory(editingExpense.category);
-
-      // Load expense date.
-      setDate(editingExpense.date);
-
-      // Remove any old error message.
-      setError("");
-    }
-
-  }, [editingExpense]);
-
-
-  // ==========================================
-  // FORM VALIDATION
-  // ==========================================
-
-  function validateForm() {
-
-    // Remove any previous error.
-    setError("");
-
-
-    // Check whether the expense name
-    // is empty.
-    if (name.trim() === "") {
-
-      setError(
-        "Please enter an expense name."
-      );
-
-      return false;
-    }
-
-
-    // Convert the amount into a number.
-    const numericAmount = Number(amount);
-
-
-    // Check whether the amount is empty,
-    // zero, or negative.
-    if (
-      amount === "" ||
-      numericAmount <= 0
-    ) {
-
-      setError(
-        "Please enter an amount greater than KSh 0."
-      );
-
-      return false;
-    }
-
-
-    // Check whether a category exists.
-    if (category.trim() === "") {
-
-      setError(
-        "Please select an expense category."
-      );
-
-      return false;
-    }
-
-
-    // Check whether a date was selected.
-    if (date === "") {
-
-      setError(
-        "Please select the expense date."
-      );
-
-      return false;
-    }
-
-
-    // Everything is valid.
-    return true;
-  }
-
-
-  // ==========================================
-  // HANDLE FORM SUBMISSION
-  // ==========================================
-
+  // Run whenever the form is submitted.
   function handleSubmit(event) {
 
     // Prevent the browser from refreshing.
     event.preventDefault();
 
 
-    // Validate the form first.
-    //
-    // If validation fails,
-    // stop the function here.
-    if (!validateForm()) {
-      return;
-    }
+    // Create an expense object.
+    const expenseData = {
 
+      // Keep the existing ID when editing.
+      id: editingExpense
+        ? editingExpense.id
+        : Date.now(),
 
-    // ========================================
-    // EDIT MODE
-    // ========================================
-
-    if (editingExpense) {
-
-      // Create the updated expense.
-      const updatedExpense = {
-
-        // Keep the original ID.
-        id: editingExpense.id,
-
-        // Store the updated name.
-        name: name.trim(),
-
-        // Convert amount into a number.
-        amount: Number(amount),
-
-        // Store the category.
-        category: category,
-
-        // Store the date.
-        date: date,
-      };
-
-
-      // Send the updated expense
-      // to App.jsx.
-      onUpdate(updatedExpense);
-
-
-      // Exit editing mode.
-      onCancelEdit();
-
-
-      // Stop here because we are finished.
-      return;
-    }
-
-
-    // ========================================
-    // ADD MODE
-    // ========================================
-
-    // Create a new expense.
-    const newExpense = {
-
-      // Generate a unique ID.
-      id: Date.now(),
-
-      // Remove unnecessary spaces
-      // from the expense name.
-      name: name.trim(),
+      // Store the expense name.
+      name: name,
 
       // Convert amount to a number.
       amount: Number(amount),
 
-      // Store the category.
+      // Store category.
       category: category,
 
-      // Store the date.
+      // Store date.
       date: date,
     };
 
 
-    // Add the new expense.
-    setExpenses(
-      (previousExpenses) => [
+    // If we are editing an expense...
+    if (editingExpense) {
+
+      // Send the updated expense
+      // back to App.jsx.
+      onUpdate(expenseData);
+
+    } else {
+
+      // Otherwise, create a new expense.
+      setExpenses((previousExpenses) => [
+
         ...previousExpenses,
-        newExpense,
-      ]
-    );
 
+        expenseData,
 
-    // Show the new expense in the console.
-    console.log(newExpense);
+      ]);
+    }
 
 
     // Clear the form.
@@ -249,128 +90,104 @@ function ExpenseForm({
     setAmount("");
     setCategory("Food");
     setDate("");
-
-    // Clear any error message.
-    setError("");
   }
 
-
-  // ==========================================
-  // CANCEL EDITING
-  // ==========================================
-
-  function handleCancelEdit() {
-
-    // Clear all form fields.
-    setName("");
-    setAmount("");
-    setCategory("Food");
-    setDate("");
-
-    // Clear any error message.
-    setError("");
-
-    // Tell App.jsx to stop editing.
-    onCancelEdit();
-  }
-
-
-  // ==========================================
-  // DISPLAY FORM
-  // ==========================================
 
   return (
-    <div>
 
-      {/* Form heading */}
-      <h2>
-        {editingExpense
-          ? "Edit Expense"
-          : "Add Expense"}
-      </h2>
+    <div className="expense-form-container">
 
 
-      {/* 
-        Display an error message only
-        when error contains something.
-      */}
-      {error && (
-        <p>
-          ⚠️ {error}
-        </p>
-      )}
-
-
-      {/* Expense form */}
-      <form onSubmit={handleSubmit}>
-
-
-        {/* ==================================
-            EXPENSE NAME
-        ================================== */}
+      {/* Form header */}
+      <div className="form-header">
 
         <div>
 
-          <label>
+          <p className="form-eyebrow">
+            {editingExpense
+              ? "UPDATE EXPENSE"
+              : "NEW TRANSACTION"}
+          </p>
+
+          <h2>
+            {editingExpense
+              ? "Edit Expense"
+              : "Add Expense"}
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      {/* Expense form */}
+      <form
+        className="expense-form"
+        onSubmit={handleSubmit}
+      >
+
+
+        {/* Expense name */}
+        <div className="form-group">
+
+          <label htmlFor="expense-name">
             Expense Name
           </label>
 
           <input
+            id="expense-name"
             type="text"
             placeholder="e.g. Lunch"
-
-            // Connect input to name state.
             value={name}
-
-            // Update name as user types.
             onChange={(event) =>
               setName(event.target.value)
             }
+            required
           />
 
         </div>
 
 
-        {/* ==================================
-            EXPENSE AMOUNT
-        ================================== */}
+        {/* Expense amount */}
+        <div className="form-group">
 
-        <div>
-
-          <label>
+          <label htmlFor="expense-amount">
             Amount
           </label>
 
-          <input
-            type="number"
-            placeholder="e.g. 500"
-            min="1"
+          <div className="amount-input">
 
-            // Connect input to amount state.
-            value={amount}
+            <span>
+              KSh
+            </span>
 
-            // Update amount as user types.
-            onChange={(event) =>
-              setAmount(event.target.value)
-            }
-          />
+            <input
+              id="expense-amount"
+              type="number"
+              placeholder="e.g. 500"
+              value={amount}
+              onChange={(event) =>
+                setAmount(event.target.value)
+              }
+              min="0"
+              required
+            />
+
+          </div>
 
         </div>
 
 
-        {/* ==================================
-            EXPENSE CATEGORY
-        ================================== */}
+        {/* Expense category */}
+        <div className="form-group">
 
-        <div>
-
-          <label>
+          <label htmlFor="expense-category">
             Category
           </label>
 
           <select
+            id="expense-category"
             value={category}
-
             onChange={(event) =>
               setCategory(event.target.value)
             }
@@ -378,81 +195,82 @@ function ExpenseForm({
 
             <option>Food</option>
 
-            <option>
-              Transport
-            </option>
+            <option>Transport</option>
 
-            <option>
-              Rent
-            </option>
+            <option>Rent</option>
 
-            <option>
-              Shopping
-            </option>
+            <option>Shopping</option>
 
-            <option>
-              Entertainment
-            </option>
+            <option>Entertainment</option>
 
-            <option>
-              Other
-            </option>
+            <option>Other</option>
 
           </select>
 
         </div>
 
 
-        {/* ==================================
-            EXPENSE DATE
-        ================================== */}
+        {/* Expense date */}
+        <div className="form-group">
 
-        <div>
-
-          <label>
+          <label htmlFor="expense-date">
             Expense Date
           </label>
 
           <input
+            id="expense-date"
             type="date"
-
             value={date}
-
             onChange={(event) =>
               setDate(event.target.value)
             }
+            required
           />
 
         </div>
 
 
-        {/* ==================================
-            BUTTONS
-        ================================== */}
-
-        <button type="submit">
-
-          {editingExpense
-            ? "Update Expense"
-            : "Add Expense"}
-
-        </button>
-
-
-        {/* 
-          Only show Cancel when
-          we are editing.
-        */}
-        {editingExpense && (
+        {/* Form buttons */}
+        <div className="form-actions">
 
           <button
-            type="button"
-            onClick={handleCancelEdit}
+            type="submit"
+            className="primary-button"
           >
-            Cancel
+
+            {editingExpense
+              ? "Update Expense"
+              : "Add Expense"}
+
           </button>
 
-        )}
+
+          {/* Show cancel button only
+              when editing. */}
+          {editingExpense && (
+
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => {
+
+                setName("");
+                setAmount("");
+                setCategory("Food");
+                setDate("");
+
+                onCancelEdit();
+
+              }}
+            >
+
+              Cancel
+
+            </button>
+
+          )}
+
+        </div>
 
       </form>
 

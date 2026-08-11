@@ -1,69 +1,126 @@
 // ExpenseItem represents ONE expense.
 //
 // onDelete = function used to delete the expense.
-// onEdit = function used to start editing the expense.
-function ExpenseItem({ expense, onDelete, onEdit }) {
+// onEdit = function used to edit the expense.
+function ExpenseItem({
+  expense,
+  onDelete,
+  onEdit,
+}) {
+
+
+  // Create a nicely formatted date.
+  const formattedDate =
+    new Date(expense.date).toLocaleDateString(
+      "en-GB",
+      {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      }
+    );
 
 
   return (
-    <div>
+
+    <div className="expense-item">
 
 
-      {/* Expense name */}
-      <h3>{expense.name}</h3>
+      {/* ==================================
+          EXPENSE INFORMATION
+      ================================== */}
+
+      <div className="expense-main">
 
 
-      {/* Expense amount */}
-      <p>KSh {expense.amount}</p>
+        {/* Category icon */}
+        <div className="expense-category-icon">
+
+          {expense.category === "Food"
+            ? "🍔"
+            : expense.category === "Transport"
+            ? "🚌"
+            : expense.category === "Rent"
+            ? "🏠"
+            : expense.category === "Shopping"
+            ? "🛍️"
+            : expense.category === "Entertainment"
+            ? "🎬"
+            : "📌"}
+
+        </div>
 
 
-      {/* Expense category */}
-      <p>{expense.category}</p>
+        {/* Name and category */}
+        <div className="expense-details">
+
+          <h3>
+            {expense.name}
+          </h3>
+
+          <div className="expense-meta">
+
+            <span className="category-badge">
+              {expense.category}
+            </span>
+
+            <span className="expense-date">
+              {formattedDate}
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
 
 
-      {/* Expense date */}
-      <p>
-        {new Date(expense.date).toLocaleDateString("en-GB", {
-          day: "2-digit",
-          month: "short",
-          year: "numeric",
-        })}
-      </p>
+      {/* ==================================
+          AMOUNT + ACTIONS
+      ================================== */}
+
+      <div className="expense-right">
 
 
-      {/* 
-        Edit button.
+        {/* Expense amount */}
+        <strong className="expense-amount">
 
-        When the user clicks Edit,
-        we call the onEdit function.
+          KSh{" "}
+          {expense.amount.toLocaleString()}
 
-        We pass the expense ID so App.jsx
-        knows exactly which expense the
-        user wants to edit.
-      */}
-      <button onClick={() => onEdit(expense.id)}>
-        Edit
-      </button>
+        </strong>
 
 
-      {/* 
-        Delete button.
+        {/* Action buttons */}
+        <div className="expense-actions">
 
-        When the user clicks Delete,
-        we call the onDelete function.
+          <button
+            className="edit-button"
+            onClick={() =>
+              onEdit(expense.id)
+            }
+          >
+            Edit
+          </button>
 
-        We pass the expense ID so App.jsx
-        knows exactly which expense to delete.
-      */}
-      <button onClick={() => onDelete(expense.id)}>
-        Delete
-      </button>
 
+          <button
+            className="delete-button"
+            onClick={() =>
+              onDelete(expense.id)
+            }
+          >
+            Delete
+          </button>
+
+        </div>
+
+      </div>
 
     </div>
   );
 }
 
 
-// Export the component.
+// Export ExpenseItem.
 export default ExpenseItem;
