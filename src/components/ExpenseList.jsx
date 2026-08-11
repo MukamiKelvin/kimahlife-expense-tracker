@@ -3,17 +3,22 @@
 // one individual expense.
 import ExpenseItem from "./ExpenseItem";
 
+
 // ExpenseList displays all expenses.
 //
 // expenses = our list of expenses.
 // onDelete = function used to delete an expense.
-function ExpenseList({ expenses, onDelete }) {
+// onEdit = function used to edit an expense.
+function ExpenseList({ expenses, onDelete, onEdit }) {
+
 
   return (
     <div>
 
+
       {/* Section heading */}
       <h2>Recent Expenses</h2>
+
 
       {/* 
         Check whether we have any expenses.
@@ -23,7 +28,9 @@ function ExpenseList({ expenses, onDelete }) {
       */}
       {expenses.length > 0 ? (
 
+
         <div>
+
 
           {/* 
             map() goes through every expense
@@ -31,26 +38,35 @@ function ExpenseList({ expenses, onDelete }) {
           */}
           {expenses.map((expense) => (
 
+
             <ExpenseItem
               key={expense.id}
               expense={expense}
               onDelete={onDelete}
+              onEdit={onEdit}
             />
+
 
           ))}
 
+
         </div>
 
+
       ) : (
+
 
         // This appears when there are no expenses.
         <p>No expenses recorded yet.</p>
 
+
       )}
+
 
     </div>
   );
 }
+
 
 // Export ExpenseList.
 export default ExpenseList;

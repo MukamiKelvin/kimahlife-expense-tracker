@@ -22,177 +22,164 @@ import IncomeForm from "./components/IncomeForm";
 // Import the SpendingChart component.
 import SpendingChart from "./components/SpendingChart";
 
+
 // App is the main component of KimSpend.
 function App() {
+
   // ==========================================
   // EXPENSE STATE
   // ==========================================
 
   // Load previously saved expenses from localStorage.
-  //
-  // If there are no saved expenses,
-  // start with an empty array.
   const [expenses, setExpenses] = useState(() => {
-    // Get saved expenses from localStorage.
+
     const savedExpenses =
       localStorage.getItem("kimSpendExpenses");
 
-    // If saved expenses exist...
     if (savedExpenses) {
-      // Convert the saved text back into
-      // a JavaScript array.
       return JSON.parse(savedExpenses);
     }
 
-    // If nothing has been saved yet,
-    // start with an empty array.
     return [];
   });
+
 
   // ==========================================
   // SAVE EXPENSES
   // ==========================================
 
-  // Whenever expenses change,
-  // save the latest expenses to localStorage.
+  // Save expenses whenever the expenses state changes.
   useEffect(() => {
-    // localStorage stores information as text.
-    //
-    // JSON.stringify converts our JavaScript
-    // array into text.
+
     localStorage.setItem(
       "kimSpendExpenses",
       JSON.stringify(expenses)
     );
+
   }, [expenses]);
+
+
+  // ==========================================
+  // EDITING EXPENSE STATE
+  // ==========================================
+
+  // This state remembers the ID of the expense
+  // that the user wants to edit.
+  //
+  // null means that we are NOT editing anything.
+  const [editingExpenseId, setEditingExpenseId] =
+    useState(null);
+
 
   // ==========================================
   // MONTHLY INCOME STATE
   // ==========================================
 
-  // Load previously saved monthly income.
-  //
-  // If there is no saved income,
-  // start with KSh 31,000.
+  // Load the user's saved monthly income.
   const [monthlyIncome, setMonthlyIncome] = useState(() => {
-    // Get saved income from localStorage.
+
     const savedIncome =
       localStorage.getItem("kimSpendIncome");
 
-    // If saved income exists...
     if (savedIncome) {
-      // Convert the saved text into a number.
       return Number(savedIncome);
     }
 
-    // Default monthly income.
     return 31000;
   });
+
 
   // ==========================================
   // SAVE MONTHLY INCOME
   // ==========================================
 
-  // Whenever monthly income changes,
-  // save it to localStorage.
   useEffect(() => {
+
     localStorage.setItem(
       "kimSpendIncome",
       monthlyIncome
     );
+
   }, [monthlyIncome]);
+
 
   // ==========================================
   // SELECTED MONTH STATE
   // ==========================================
 
   // Store the month currently being analyzed.
-  //
-  // Example:
-  //
-  // 2026-08 = August 2026
   const [selectedMonth, setSelectedMonth] = useState(() => {
-    // Get the previously selected month.
+
     const savedMonth =
       localStorage.getItem("kimSpendMonth");
 
-    // If a saved month exists,
-    // restore it.
     if (savedMonth) {
       return savedMonth;
     }
 
-    // Default month.
     return "2026-08";
   });
+
 
   // ==========================================
   // SAVE SELECTED MONTH
   // ==========================================
 
-  // Whenever selectedMonth changes,
-  // save it to localStorage.
   useEffect(() => {
+
     localStorage.setItem(
       "kimSpendMonth",
       selectedMonth
     );
+
   }, [selectedMonth]);
+
 
   // ==========================================
   // PREVIOUS MONTH
   // ==========================================
 
-  // Convert the selected month into a Date object.
   const currentMonthDate =
     new Date(`${selectedMonth}-01`);
 
-  // Create another Date object for
-  // the previous month.
   const previousMonthDate =
     new Date(currentMonthDate);
 
-  // Move the date one month backwards.
   previousMonthDate.setMonth(
     previousMonthDate.getMonth() - 1
   );
 
-  // Convert the previous month back into
-  // YYYY-MM format.
   const previousMonth =
     previousMonthDate
       .toISOString()
       .slice(0, 7);
 
+
   // ==========================================
   // MONTHLY EXPENSES
   // ==========================================
 
-  // Get only expenses belonging to
-  // the selected month.
   const monthlyExpenses = expenses.filter(
     (expense) =>
       expense.date.startsWith(selectedMonth)
   );
 
+
   // ==========================================
   // PREVIOUS MONTH EXPENSES
   // ==========================================
 
-  // Get only expenses belonging to
-  // the previous month.
   const previousMonthExpenses =
     expenses.filter(
       (expense) =>
         expense.date.startsWith(previousMonth)
     );
 
+
   // ==========================================
   // MONTHLY TOTAL
   // ==========================================
 
-  // Calculate how much was spent
-  // during the selected month.
   const monthlyTotal =
     monthlyExpenses.reduce(
       (total, expense) =>
@@ -200,12 +187,11 @@ function App() {
       0
     );
 
+
   // ==========================================
   // PREVIOUS MONTH TOTAL
   // ==========================================
 
-  // Calculate how much was spent during
-  // the previous month.
   const previousMonthTotal =
     previousMonthExpenses.reduce(
       (total, expense) =>
@@ -213,97 +199,74 @@ function App() {
       0
     );
 
+
   // ==========================================
   // SPENDING DIFFERENCE
   // ==========================================
 
-  // Compare this month's spending
-  // with the previous month's spending.
   const spendingDifference =
     monthlyTotal - previousMonthTotal;
+
 
   // ==========================================
   // SPENDING PERCENTAGE CHANGE
   // ==========================================
 
-  // Calculate the percentage change
-  // compared to the previous month.
-  //
-  // We only calculate it when the previous
-  // month has some spending.
   const spendingPercentageChange =
     previousMonthTotal > 0
       ? (spendingDifference / previousMonthTotal) * 100
       : 0;
 
+
   // ==========================================
   // CATEGORY TOTALS
   // ==========================================
 
-  // Calculate how much was spent
-  // in each category.
-  //
-  // Example:
-  //
-  // {
-  //   Food: 5000,
-  //   Transport: 3000,
-  //   Shopping: 3500
-  // }
   const categoryTotals =
     monthlyExpenses.reduce(
       (totals, expense) => {
-        // Get the category of the expense.
+
         const category = expense.category;
 
-        // If this category doesn't exist yet,
-        // create it and start at zero.
         if (!totals[category]) {
           totals[category] = 0;
         }
 
-        // Add the expense amount
-        // to that category.
         totals[category] += expense.amount;
 
-        // Return the updated totals.
         return totals;
+
       },
       {}
     );
+
 
   // ==========================================
   // HIGHEST SPENDING CATEGORY
   // ==========================================
 
-  // Convert categoryTotals into an array.
   const categoryEntries =
     Object.entries(categoryTotals);
 
-  // Find the category with the
-  // highest spending.
   const highestCategory =
     categoryEntries.reduce(
       (highest, current) => {
-        // current[1] is the current amount.
-        //
-        // highest[1] is the highest amount
-        // found so far.
+
         if (current[1] > highest[1]) {
           return current;
         }
 
         return highest;
+
       },
       ["None", 0]
     );
+
 
   // ==========================================
   // TOTAL EXPENSES
   // ==========================================
 
-  // Calculate total spending across
-  // ALL recorded expenses.
   const totalExpenses =
     expenses.reduce(
       (total, expense) =>
@@ -311,51 +274,106 @@ function App() {
       0
     );
 
+
   // ==========================================
   // OVERALL BALANCE
   // ==========================================
 
-  // Calculate the overall balance.
   const balance =
     monthlyIncome - totalExpenses;
+
 
   // ==========================================
   // MONTHLY BALANCE
   // ==========================================
 
-  // Calculate how much money remains
-  // for the selected month.
   const monthlyBalance =
     monthlyIncome - monthlyTotal;
+
 
   // ==========================================
   // INCOME USAGE PERCENTAGE
   // ==========================================
 
-  // Calculate what percentage of the
-  // monthly income has been spent.
   const incomeUsedPercentage =
     monthlyIncome > 0
       ? (monthlyTotal / monthlyIncome) * 100
       : 0;
 
+
   // ==========================================
   // DEFICIT CHECK
   // ==========================================
 
-  // Check whether spending has exceeded
-  // the available income.
   const hasDeficit =
     balance < 0;
+
+
+  // ==========================================
+// START EDITING
+// ==========================================
+
+// This function runs when the user clicks
+// the Edit button.
+//
+// It remembers which expense the user
+// wants to edit.
+function handleEdit(expenseId) {
+
+  // Store the expense ID in our state.
+  setEditingExpenseId(expenseId);
+
+  // Show the ID in the console.
+  console.log(
+    "Editing expense:",
+    expenseId
+  );
+}
+
+// ==========================================
+// UPDATE EXPENSE
+// ==========================================
+
+// This function receives the updated expense
+// from ExpenseForm.
+function handleUpdate(updatedExpense) {
+
+  // Go through all our expenses.
+  setExpenses((previousExpenses) =>
+
+    previousExpenses.map((expense) => {
+
+      // Check whether this is the expense
+      // that we are currently updating.
+      if (expense.id === updatedExpense.id) {
+
+        // Replace the old expense with
+        // the updated expense.
+        return updatedExpense;
+      }
+
+      // Keep every other expense unchanged.
+      return expense;
+    })
+  );
+
+  // Exit editing mode.
+  setEditingExpenseId(null);
+
+  // Show the updated expense in the console.
+  console.log(
+    "Expense updated:",
+    updatedExpense
+  );
+}
+
 
   // ==========================================
   // DELETE EXPENSE
   // ==========================================
 
-  // Delete an expense using its ID.
   function handleDelete(expenseId) {
-    // Keep every expense except
-    // the one being deleted.
+
     setExpenses(
       (previousExpenses) =>
         previousExpenses.filter(
@@ -365,17 +383,22 @@ function App() {
     );
   }
 
+
   // ==========================================
-  // DISPLAY THE APPLICATION
+  // DISPLAY APPLICATION
   // ==========================================
 
   return (
     <div>
+
       {/* Display the navigation bar */}
       <Navbar />
 
+
       {/* Main content of KimSpend */}
       <main>
+
+
         {/* ==================================
             DASHBOARD HEADING
         ================================== */}
@@ -386,24 +409,23 @@ function App() {
           Welcome to your KimSpend financial dashboard.
         </p>
 
+
         {/* ==================================
             FINANCIAL SUMMARY
         ================================== */}
 
         <section>
-          {/* Monthly income */}
+
           <SummaryCard
             title="Monthly Income"
             amount={`KSh ${monthlyIncome.toLocaleString()}`}
           />
 
-          {/* Total expenses */}
           <SummaryCard
             title="Total Expenses"
             amount={`KSh ${totalExpenses.toLocaleString()}`}
           />
 
-          {/* Balance or deficit */}
           <SummaryCard
             title={
               hasDeficit
@@ -412,28 +434,25 @@ function App() {
             }
             amount={`KSh ${Math.abs(balance).toLocaleString()}`}
           />
+
         </section>
+
 
         {/* ==================================
             MONTHLY OVERVIEW
         ================================== */}
 
         <section>
+
           <h2>Monthly Overview</h2>
 
-          {/* Month selector */}
           <label>
             Select Month:
           </label>
 
           <input
             type="month"
-
-            // Show the selected month.
             value={selectedMonth}
-
-            // Update the selected month
-            // when the user chooses another one.
             onChange={(event) =>
               setSelectedMonth(
                 event.target.value
@@ -441,29 +460,29 @@ function App() {
             }
           />
 
-          {/* Display selected month */}
           <p>
             Selected Month: {selectedMonth}
           </p>
 
-          {/* Display monthly spending */}
           <p>
             Monthly Spending: KSh{" "}
             {monthlyTotal.toLocaleString()}
           </p>
 
-          {/* Display monthly balance */}
           <p>
             Monthly Balance: KSh{" "}
             {monthlyBalance.toLocaleString()}
           </p>
+
         </section>
+
 
         {/* ==================================
             INCOME USAGE
         ================================== */}
 
         <section>
+
           <h2>Income Usage</h2>
 
           <p>
@@ -485,43 +504,57 @@ function App() {
             Remaining: KSh{" "}
             {monthlyBalance.toLocaleString()}
           </p>
+
         </section>
+
 
         {/* ==================================
             INCOME INSIGHT
         ================================== */}
 
         <section>
+
           <h2>Income Insight</h2>
 
           {incomeUsedPercentage > 100 ? (
+
             <p>
               🔴 You have spent more than
               your monthly income.
             </p>
+
           ) : incomeUsedPercentage > 80 ? (
+
             <p>
               🚨 You have used more than
               80% of your monthly income.
             </p>
+
           ) : incomeUsedPercentage > 50 ? (
+
             <p>
               ⚠️ You have used more than
               half of your monthly income.
             </p>
+
           ) : (
+
             <p>
               ✅ Your spending is currently
               below 50% of your income.
             </p>
+
           )}
+
         </section>
 
+
         {/* ==================================
-            MONTH-TO-MONTH COMPARISON
+            MONTHLY COMPARISON
         ================================== */}
 
         <section>
+
           <h2>Monthly Comparison</h2>
 
           <p>
@@ -551,14 +584,15 @@ function App() {
             ).toFixed(1)}%
           </p>
 
-          {/* Comparison message */}
-
           {previousMonthTotal === 0 ? (
+
             <p>
               ℹ️ There is no spending data
               for the previous month yet.
             </p>
+
           ) : spendingDifference > 0 ? (
+
             <p>
               📈 You spent{" "}
               {Math.abs(
@@ -566,7 +600,9 @@ function App() {
               ).toFixed(1)}%
               more this month than last month.
             </p>
+
           ) : spendingDifference < 0 ? (
+
             <p>
               📉 You spent{" "}
               {Math.abs(
@@ -574,32 +610,35 @@ function App() {
               ).toFixed(1)}%
               less this month than last month.
             </p>
+
           ) : (
+
             <p>
               ➖ Your spending is the same
               as last month.
             </p>
+
           )}
+
         </section>
+
 
         {/* ==================================
             CATEGORY ANALYSIS
         ================================== */}
 
         <section>
+
           <h2>Spending by Category</h2>
 
           {Object.entries(categoryTotals).map(
             ([category, total]) => {
-              // Calculate the percentage
-              // of monthly spending.
+
               const spendingPercentage =
                 monthlyTotal > 0
                   ? (total / monthlyTotal) * 100
                   : 0;
 
-              // Calculate the percentage
-              // of monthly income.
               const incomePercentage =
                 monthlyIncome > 0
                   ? (total / monthlyIncome) * 100
@@ -607,6 +646,7 @@ function App() {
 
               return (
                 <div key={category}>
+
                   <p>
                     <strong>
                       {category}
@@ -627,11 +667,14 @@ function App() {
                     {incomePercentage.toFixed(1)}%
                     of monthly income
                   </p>
+
                 </div>
               );
             }
           )}
+
         </section>
+
 
         {/* ==================================
             SPENDING CHART
@@ -641,11 +684,13 @@ function App() {
           categoryTotals={categoryTotals}
         />
 
+
         {/* ==================================
             FINANCIAL INSIGHT
         ================================== */}
 
         <section>
+
           <h2>
             💡 Financial Insight
           </h2>
@@ -675,7 +720,9 @@ function App() {
             }%
             of your monthly spending
           </p>
+
         </section>
+
 
         {/* ==================================
             INCOME FORM
@@ -690,15 +737,33 @@ function App() {
           }
         />
 
+
         {/* ==================================
             EXPENSE FORM
         ================================== */}
 
-        <ExpenseForm
-          setExpenses={
-            setExpenses
-          }
-        />
+       <ExpenseForm
+  // Used when adding a new expense.
+  setExpenses={setExpenses}
+
+  // Find the expense currently being edited.
+  editingExpense={
+    expenses.find(
+      (expense) =>
+        expense.id === editingExpenseId
+    )
+  }
+
+  // Function used by ExpenseForm
+  // to update the expense.
+  onUpdate={handleUpdate}
+
+  // Function used to cancel editing.
+  onCancelEdit={() =>
+    setEditingExpenseId(null)
+  }
+/>
+
 
         {/* ==================================
             EXPENSE LIST
@@ -707,11 +772,47 @@ function App() {
         <ExpenseList
           expenses={expenses}
           onDelete={handleDelete}
+
+          // Pass our handleEdit function
+          // down to ExpenseList.
+          onEdit={handleEdit}
         />
+
+
+        {/* ==================================
+            EDITING INFORMATION
+        ================================== */}
+
+        {/* 
+          This is temporary.
+
+          We are displaying the ID of the
+          expense currently being edited.
+
+          Later, we will replace this with
+          an actual edit form.
+        */}
+        {editingExpenseId && (
+          <section>
+
+            <h2>
+              Editing Expense
+            </h2>
+
+            <p>
+              Expense ID: {editingExpenseId}
+            </p>
+
+          </section>
+        )}
+
+
       </main>
+
     </div>
   );
 }
+
 
 // Export App so main.jsx can use it.
 export default App;

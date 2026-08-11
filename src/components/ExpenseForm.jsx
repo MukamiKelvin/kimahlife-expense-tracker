@@ -1,99 +1,328 @@
-// Import useState from React.
-// useState allows our component to remember information.
-import { useState } from "react";
-
-// ExpenseForm collects information about
-// a new expense from the user.
+// Import useState and useEffect from React.
 //
-// setExpenses is received from App.jsx as a prop.
-// We use it to add the new expense to the
-// main expenses array.
-function ExpenseForm({ setExpenses }) {
+// useState allows our component to remember information.
+// useEffect allows us to run code when editingExpense changes.
+import { useState, useEffect } from "react";
 
-  // Store the name of the expense.
-  // Example: "Lunch"
+
+// ExpenseForm can perform TWO actions:
+//
+// 1. Add a new expense.
+// 2. Edit an existing expense.
+//
+// setExpenses = adds a new expense.
+// editingExpense = expense currently being edited.
+// onUpdate = updates an existing expense.
+// onCancelEdit = cancels editing mode.
+function ExpenseForm({
+  setExpenses,
+  editingExpense,
+  onUpdate,
+  onCancelEdit,
+}) {
+
+
+  // ==========================================
+  // FORM STATE
+  // ==========================================
+
+  // Store the expense name.
   const [name, setName] = useState("");
 
-  // Store the amount of the expense.
-  // Example: "500"
+
+  // Store the expense amount.
   const [amount, setAmount] = useState("");
 
-  // Store the selected category.
-  // Food is our default category.
+
+  // Store the expense category.
   const [category, setCategory] = useState("Food");
 
-  // Store the date of the expense.
-  // Example: "2026-08-11"
+
+  // Store the expense date.
   const [date, setDate] = useState("");
 
-  // This function runs when the user submits the form.
+
+  // Store validation error messages.
+  //
+  // If there is no error, this will be empty.
+  const [error, setError] = useState("");
+
+
+  // ==========================================
+  // LOAD EXPENSE INTO FORM
+  // ==========================================
+
+  // When the user clicks Edit,
+  // load the selected expense into the form.
+  useEffect(() => {
+
+    if (editingExpense) {
+
+      // Load expense name.
+      setName(editingExpense.name);
+
+      // Load expense amount.
+      setAmount(
+        String(editingExpense.amount)
+      );
+
+      // Load expense category.
+      setCategory(editingExpense.category);
+
+      // Load expense date.
+      setDate(editingExpense.date);
+
+      // Remove any old error message.
+      setError("");
+    }
+
+  }, [editingExpense]);
+
+
+  // ==========================================
+  // FORM VALIDATION
+  // ==========================================
+
+  function validateForm() {
+
+    // Remove any previous error.
+    setError("");
+
+
+    // Check whether the expense name
+    // is empty.
+    if (name.trim() === "") {
+
+      setError(
+        "Please enter an expense name."
+      );
+
+      return false;
+    }
+
+
+    // Convert the amount into a number.
+    const numericAmount = Number(amount);
+
+
+    // Check whether the amount is empty,
+    // zero, or negative.
+    if (
+      amount === "" ||
+      numericAmount <= 0
+    ) {
+
+      setError(
+        "Please enter an amount greater than KSh 0."
+      );
+
+      return false;
+    }
+
+
+    // Check whether a category exists.
+    if (category.trim() === "") {
+
+      setError(
+        "Please select an expense category."
+      );
+
+      return false;
+    }
+
+
+    // Check whether a date was selected.
+    if (date === "") {
+
+      setError(
+        "Please select the expense date."
+      );
+
+      return false;
+    }
+
+
+    // Everything is valid.
+    return true;
+  }
+
+
+  // ==========================================
+  // HANDLE FORM SUBMISSION
+  // ==========================================
+
   function handleSubmit(event) {
 
-    // Prevent the browser from refreshing the page.
+    // Prevent the browser from refreshing.
     event.preventDefault();
 
-    // Create an object representing the new expense.
+
+    // Validate the form first.
+    //
+    // If validation fails,
+    // stop the function here.
+    if (!validateForm()) {
+      return;
+    }
+
+
+    // ========================================
+    // EDIT MODE
+    // ========================================
+
+    if (editingExpense) {
+
+      // Create the updated expense.
+      const updatedExpense = {
+
+        // Keep the original ID.
+        id: editingExpense.id,
+
+        // Store the updated name.
+        name: name.trim(),
+
+        // Convert amount into a number.
+        amount: Number(amount),
+
+        // Store the category.
+        category: category,
+
+        // Store the date.
+        date: date,
+      };
+
+
+      // Send the updated expense
+      // to App.jsx.
+      onUpdate(updatedExpense);
+
+
+      // Exit editing mode.
+      onCancelEdit();
+
+
+      // Stop here because we are finished.
+      return;
+    }
+
+
+    // ========================================
+    // ADD MODE
+    // ========================================
+
+    // Create a new expense.
     const newExpense = {
 
-      // Create a unique ID using the current time.
+      // Generate a unique ID.
       id: Date.now(),
 
-      // Store the expense name.
-      name: name,
+      // Remove unnecessary spaces
+      // from the expense name.
+      name: name.trim(),
 
-      // Convert the amount from text into a number.
+      // Convert amount to a number.
       amount: Number(amount),
 
-      // Store the selected category.
+      // Store the category.
       category: category,
 
-      // Store the expense date.
+      // Store the date.
       date: date,
     };
 
-    // Add the new expense to the expenses array.
-    //
-    // previousExpenses represents all expenses
-    // that were already added.
-    setExpenses((previousExpenses) => [
-      ...previousExpenses,
-      newExpense,
-    ]);
 
-    // Show the newly created expense in the browser console.
+    // Add the new expense.
+    setExpenses(
+      (previousExpenses) => [
+        ...previousExpenses,
+        newExpense,
+      ]
+    );
+
+
+    // Show the new expense in the console.
     console.log(newExpense);
 
-    // Clear the form after adding the expense.
+
+    // Clear the form.
     setName("");
     setAmount("");
+    setCategory("Food");
     setDate("");
+
+    // Clear any error message.
+    setError("");
   }
+
+
+  // ==========================================
+  // CANCEL EDITING
+  // ==========================================
+
+  function handleCancelEdit() {
+
+    // Clear all form fields.
+    setName("");
+    setAmount("");
+    setCategory("Food");
+    setDate("");
+
+    // Clear any error message.
+    setError("");
+
+    // Tell App.jsx to stop editing.
+    onCancelEdit();
+  }
+
+
+  // ==========================================
+  // DISPLAY FORM
+  // ==========================================
 
   return (
     <div>
 
       {/* Form heading */}
-      <h2>Add Expense</h2>
+      <h2>
+        {editingExpense
+          ? "Edit Expense"
+          : "Add Expense"}
+      </h2>
+
 
       {/* 
-        When the user submits this form,
-        React will run handleSubmit().
+        Display an error message only
+        when error contains something.
       */}
+      {error && (
+        <p>
+          ⚠️ {error}
+        </p>
+      )}
+
+
+      {/* Expense form */}
       <form onSubmit={handleSubmit}>
 
-        {/* Expense name */}
+
+        {/* ==================================
+            EXPENSE NAME
+        ================================== */}
+
         <div>
 
-          <label>Expense Name</label>
+          <label>
+            Expense Name
+          </label>
 
           <input
             type="text"
             placeholder="e.g. Lunch"
 
-            // Connect the input to our name state.
+            // Connect input to name state.
             value={name}
 
-            // Update name whenever the user types.
+            // Update name as user types.
             onChange={(event) =>
               setName(event.target.value)
             }
@@ -101,19 +330,26 @@ function ExpenseForm({ setExpenses }) {
 
         </div>
 
-        {/* Expense amount */}
+
+        {/* ==================================
+            EXPENSE AMOUNT
+        ================================== */}
+
         <div>
 
-          <label>Amount</label>
+          <label>
+            Amount
+          </label>
 
           <input
             type="number"
             placeholder="e.g. 500"
+            min="1"
 
-            // Connect the input to our amount state.
+            // Connect input to amount state.
             value={amount}
 
-            // Update amount whenever the user types.
+            // Update amount as user types.
             onChange={(event) =>
               setAmount(event.target.value)
             }
@@ -121,44 +357,67 @@ function ExpenseForm({ setExpenses }) {
 
         </div>
 
-        {/* Expense category */}
+
+        {/* ==================================
+            EXPENSE CATEGORY
+        ================================== */}
+
         <div>
 
-          <label>Category</label>
+          <label>
+            Category
+          </label>
 
           <select
-            // Connect the select element to category state.
             value={category}
 
-            // Update category when the user
-            // selects a different option.
             onChange={(event) =>
               setCategory(event.target.value)
             }
           >
+
             <option>Food</option>
-            <option>Transport</option>
-            <option>Rent</option>
-            <option>Shopping</option>
-            <option>Entertainment</option>
-            <option>Other</option>
+
+            <option>
+              Transport
+            </option>
+
+            <option>
+              Rent
+            </option>
+
+            <option>
+              Shopping
+            </option>
+
+            <option>
+              Entertainment
+            </option>
+
+            <option>
+              Other
+            </option>
+
           </select>
 
         </div>
 
-        {/* Expense date */}
+
+        {/* ==================================
+            EXPENSE DATE
+        ================================== */}
+
         <div>
 
-          <label>Expense Date</label>
+          <label>
+            Expense Date
+          </label>
 
           <input
             type="date"
 
-            // Connect the input to our date state.
             value={date}
 
-            // Update the date whenever the user
-            // selects a date.
             onChange={(event) =>
               setDate(event.target.value)
             }
@@ -166,10 +425,34 @@ function ExpenseForm({ setExpenses }) {
 
         </div>
 
-        {/* Submit button */}
+
+        {/* ==================================
+            BUTTONS
+        ================================== */}
+
         <button type="submit">
-          Add Expense
+
+          {editingExpense
+            ? "Update Expense"
+            : "Add Expense"}
+
         </button>
+
+
+        {/* 
+          Only show Cancel when
+          we are editing.
+        */}
+        {editingExpense && (
+
+          <button
+            type="button"
+            onClick={handleCancelEdit}
+          >
+            Cancel
+          </button>
+
+        )}
 
       </form>
 
@@ -177,5 +460,6 @@ function ExpenseForm({ setExpenses }) {
   );
 }
 
-// Export ExpenseForm so App.jsx can use it.
+
+// Export ExpenseForm.
 export default ExpenseForm;
