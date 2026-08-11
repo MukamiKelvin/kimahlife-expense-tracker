@@ -14,6 +14,9 @@ import ExpenseForm from "./components/ExpenseForm";
 // Import the ExpenseList component.
 import ExpenseList from "./components/ExpenseList";
 
+// Import the IncomeForm component.
+import IncomeForm from "./components/IncomeForm";
+
 
 // App is the main component of PesaLens.
 function App() {
@@ -27,6 +30,10 @@ function App() {
   // added any expenses yet.
   const [expenses, setExpenses] = useState([]);
 
+  // Store the user's monthly income.
+// We start with 31,000 for now.
+const [monthlyIncome, setMonthlyIncome] = useState(31000);
+
   // Calculate the total amount spent.
 //
 // reduce() goes through every expense
@@ -36,7 +43,6 @@ const totalExpenses = expenses.reduce(
   0
 );
 
-const monthlyIncome = 31000;
 
 // Calculate how much money remains
 // after subtracting expenses from income.
@@ -107,6 +113,12 @@ function handleDelete(expenseId) {
 />
 
         </section>
+
+        {/* Allow the user to set their monthly income */}
+<IncomeForm
+  setMonthlyIncome={setMonthlyIncome}
+  currentIncome={monthlyIncome}
+/>
 
 
         {/* 
