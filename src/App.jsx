@@ -11,6 +11,9 @@ import SummaryCard from "./components/SummaryCard";
 // Import the ExpenseForm component.
 import ExpenseForm from "./components/ExpenseForm";
 
+// Import the ExpenseList component.
+import ExpenseList from "./components/ExpenseList";
+
 
 // App is the main component of PesaLens.
 function App() {
@@ -79,6 +82,15 @@ function App() {
         <ExpenseForm
           setExpenses={setExpenses}
         />
+
+        {/* 
+  Pass our expenses state to ExpenseList.
+
+  ExpenseList will use this data to display
+  every expense on the screen.
+*/}
+<ExpenseList expenses={expenses} />
+
 
       </main>
 
