@@ -27,6 +27,27 @@ function App() {
   // added any expenses yet.
   const [expenses, setExpenses] = useState([]);
 
+  // Calculate the total amount spent.
+//
+// reduce() goes through every expense
+// and adds its amount to the running total.
+const totalExpenses = expenses.reduce(
+  (total, expense) => total + expense.amount,
+  0
+);
+
+const monthlyIncome = 31000;
+
+// Calculate how much money remains
+// after subtracting expenses from income.
+const balance = monthlyIncome - totalExpenses;
+
+// Check whether the user has a deficit.
+//
+// If balance is negative, the user spent
+// more money than they earned.
+const hasDeficit = balance < 0;
+
   // This function deletes an expense.
 //
 // It receives the ID of the expense
@@ -67,23 +88,23 @@ function handleDelete(expenseId) {
 
           {/* Monthly income */}
           <SummaryCard
-            title="Monthly Income"
-            amount="KSh 31,000"
-          />
+  title="Monthly Income"
+  amount={`KSh ${monthlyIncome.toLocaleString()}`}
+/>
 
 
           {/* Total expenses */}
           <SummaryCard
-            title="Total Expenses"
-            amount="KSh 24,500"
-          />
+  title="Total Expenses"
+  amount={`KSh ${totalExpenses.toLocaleString()}`}
+/>
 
 
           {/* Current balance */}
           <SummaryCard
-            title="Balance"
-            amount="KSh 6,500"
-          />
+  title={hasDeficit ? "Deficit" : "Balance"}
+  amount={`KSh ${Math.abs(balance).toLocaleString()}`}
+/>
 
         </section>
 
