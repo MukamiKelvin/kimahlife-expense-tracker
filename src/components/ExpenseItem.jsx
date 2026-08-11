@@ -17,6 +17,15 @@ function ExpenseItem({ expense, onDelete }) {
       {/* Expense category */}
       <p>{expense.category}</p>
 
+      {/* Expense date */}
+      <p>
+  {new Date(expense.date).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  })}
+      </p>
+
       {/* 
         When the user clicks this button,
         call the onDelete function.

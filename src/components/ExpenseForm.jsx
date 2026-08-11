@@ -6,7 +6,7 @@ import { useState } from "react";
 // a new expense from the user.
 //
 // setExpenses is received from App.jsx as a prop.
-// We will use it to add the new expense to the
+// We use it to add the new expense to the
 // main expenses array.
 function ExpenseForm({ setExpenses }) {
 
@@ -22,6 +22,9 @@ function ExpenseForm({ setExpenses }) {
   // Food is our default category.
   const [category, setCategory] = useState("Food");
 
+  // Store the date of the expense.
+  // Example: "2026-08-11"
+  const [date, setDate] = useState("");
 
   // This function runs when the user submits the form.
   function handleSubmit(event) {
@@ -43,6 +46,9 @@ function ExpenseForm({ setExpenses }) {
 
       // Store the selected category.
       category: category,
+
+      // Store the expense date.
+      date: date,
     };
 
     // Add the new expense to the expenses array.
@@ -54,11 +60,14 @@ function ExpenseForm({ setExpenses }) {
       newExpense,
     ]);
 
-    // Show the newly created expense in the
-    // browser console so we can confirm it works.
+    // Show the newly created expense in the browser console.
     console.log(newExpense);
-  }
 
+    // Clear the form after adding the expense.
+    setName("");
+    setAmount("");
+    setDate("");
+  }
 
   return (
     <div>
@@ -74,6 +83,7 @@ function ExpenseForm({ setExpenses }) {
 
         {/* Expense name */}
         <div>
+
           <label>Expense Name</label>
 
           <input
@@ -88,11 +98,12 @@ function ExpenseForm({ setExpenses }) {
               setName(event.target.value)
             }
           />
-        </div>
 
+        </div>
 
         {/* Expense amount */}
         <div>
+
           <label>Amount</label>
 
           <input
@@ -107,19 +118,20 @@ function ExpenseForm({ setExpenses }) {
               setAmount(event.target.value)
             }
           />
-        </div>
 
+        </div>
 
         {/* Expense category */}
         <div>
+
           <label>Category</label>
 
           <select
             // Connect the select element to category state.
             value={category}
 
-            // Update category when the user selects
-            // a different option.
+            // Update category when the user
+            // selects a different option.
             onChange={(event) =>
               setCategory(event.target.value)
             }
@@ -131,8 +143,28 @@ function ExpenseForm({ setExpenses }) {
             <option>Entertainment</option>
             <option>Other</option>
           </select>
+
         </div>
 
+        {/* Expense date */}
+        <div>
+
+          <label>Expense Date</label>
+
+          <input
+            type="date"
+
+            // Connect the input to our date state.
+            value={date}
+
+            // Update the date whenever the user
+            // selects a date.
+            onChange={(event) =>
+              setDate(event.target.value)
+            }
+          />
+
+        </div>
 
         {/* Submit button */}
         <button type="submit">
@@ -144,7 +176,6 @@ function ExpenseForm({ setExpenses }) {
     </div>
   );
 }
-
 
 // Export ExpenseForm so App.jsx can use it.
 export default ExpenseForm;

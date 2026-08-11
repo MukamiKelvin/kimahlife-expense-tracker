@@ -1,5 +1,6 @@
 // Import useState from React.
-// useState allows App to remember our expenses.
+// useState allows App to remember information
+// and update the screen when that information changes.
 import { useState } from "react";
 
 // Import the Navbar component.
@@ -21,54 +22,157 @@ import IncomeForm from "./components/IncomeForm";
 // App is the main component of PesaLens.
 function App() {
 
-  // Create a state variable called "expenses".
-  //
-  // expenses = contains all the expenses we have added.
-  // setExpenses = function used to update the expenses.
-  //
-  // We start with an empty array because we haven't
-  // added any expenses yet.
+  // ==========================================
+  // EXPENSE STATE
+  // ==========================================
+
+  // Store all expenses in our application.
   const [expenses, setExpenses] = useState([]);
 
+
+  // ==========================================
+  // INCOME STATE
+  // ==========================================
+
   // Store the user's monthly income.
-// We start with 31,000 for now.
-const [monthlyIncome, setMonthlyIncome] = useState(31000);
-
-  // Calculate the total amount spent.
-//
-// reduce() goes through every expense
-// and adds its amount to the running total.
-const totalExpenses = expenses.reduce(
-  (total, expense) => total + expense.amount,
-  0
-);
+  // We start with KSh 31,000 for now.
+  const [monthlyIncome, setMonthlyIncome] = useState(31000);
 
 
-// Calculate how much money remains
-// after subtracting expenses from income.
-const balance = monthlyIncome - totalExpenses;
+  // ==========================================
+  // SELECTED MONTH STATE
+  // ==========================================
 
-// Check whether the user has a deficit.
-//
-// If balance is negative, the user spent
-// more money than they earned.
-const hasDeficit = balance < 0;
+  // Store the month that the user wants to analyze.
+  //
+  // Format:
+  // YYYY-MM
+  //
+  // Example:
+  // 2026-08 = August 2026
+  const [selectedMonth, setSelectedMonth] = useState("2026-08");
 
-  // This function deletes an expense.
-//
-// It receives the ID of the expense
-// we want to remove.
-function handleDelete(expenseId) {
 
-  // Create a new array containing every expense
-  // EXCEPT the one whose ID matches expenseId.
-  setExpenses((previousExpenses) =>
-    previousExpenses.filter(
-      (expense) => expense.id !== expenseId
-    )
+  // ==========================================
+  // MONTHLY EXPENSES
+  // ==========================================
+
+  // Get only the expenses belonging to
+  // the currently selected month.
+  const monthlyExpenses = expenses.filter((expense) =>
+    expense.date.startsWith(selectedMonth)
   );
-}
 
+
+  // ==========================================
+  // MONTHLY TOTAL
+  // ==========================================
+
+  // Calculate how much was spent during
+  // the selected month.
+  const monthlyTotal = monthlyExpenses.reduce(
+    (total, expense) => total + expense.amount,
+    0
+  );
+
+
+  // ==========================================
+  // CATEGORY TOTALS
+  // ==========================================
+
+  // Calculate how much was spent in each
+  // category for the selected month.
+  //
+  // Example result:
+  //
+  // {
+  //   Food: 5000,
+  //   Transport: 3000,
+  //   Rent: 8500
+  // }
+  const categoryTotals = monthlyExpenses.reduce(
+    (totals, expense) => {
+
+      // Get the category of the current expense.
+      const category = expense.category;
+
+
+      // If this category doesn't exist yet,
+      // create it and start it at zero.
+      if (!totals[category]) {
+        totals[category] = 0;
+      }
+
+
+      // Add the expense amount to the
+      // correct category.
+      totals[category] += expense.amount;
+
+
+      // Return the updated totals object.
+      return totals;
+
+    },
+    {}
+  );
+
+
+  // ==========================================
+  // TOTAL EXPENSES
+  // ==========================================
+
+  // Calculate the total amount spent across
+  // ALL recorded expenses.
+  const totalExpenses = expenses.reduce(
+    (total, expense) => total + expense.amount,
+    0
+  );
+
+
+  // ==========================================
+  // OVERALL BALANCE
+  // ==========================================
+
+  // Calculate the overall balance.
+  const balance = monthlyIncome - totalExpenses;
+
+
+  // ==========================================
+  // MONTHLY BALANCE
+  // ==========================================
+
+  // Calculate the balance for the selected month.
+  const monthlyBalance = monthlyIncome - monthlyTotal;
+
+
+  // ==========================================
+  // DEFICIT CHECK
+  // ==========================================
+
+  // Check whether the overall balance is negative.
+  const hasDeficit = balance < 0;
+
+
+  // ==========================================
+  // DELETE EXPENSE
+  // ==========================================
+
+  // Delete an expense using its ID.
+  function handleDelete(expenseId) {
+
+    // Keep every expense except the one
+    // whose ID matches expenseId.
+    setExpenses((previousExpenses) =>
+      previousExpenses.filter(
+        (expense) => expense.id !== expenseId
+      )
+    );
+  }
+
+
+  // ==========================================
+  // DISPLAY THE APPLICATION
+  // ==========================================
 
   return (
     <div>
@@ -77,71 +181,228 @@ function handleDelete(expenseId) {
       <Navbar />
 
 
-      {/* Main content of our application */}
+      {/* Main content of the application */}
       <main>
 
-        {/* Main dashboard heading */}
+
+        {/* ==================================
+            DASHBOARD HEADING
+        ================================== */}
+
         <h1>Financial Dashboard</h1>
 
-        {/* Short description of the application */}
         <p>
           Welcome to your PesaLens financial dashboard.
         </p>
 
 
-        {/* Financial summary section */}
+        {/* ==================================
+            FINANCIAL SUMMARY
+        ================================== */}
+
         <section>
 
           {/* Monthly income */}
           <SummaryCard
-  title="Monthly Income"
-  amount={`KSh ${monthlyIncome.toLocaleString()}`}
-/>
+            title="Monthly Income"
+            amount={`KSh ${monthlyIncome.toLocaleString()}`}
+          />
 
 
           {/* Total expenses */}
           <SummaryCard
-  title="Total Expenses"
-  amount={`KSh ${totalExpenses.toLocaleString()}`}
-/>
+            title="Total Expenses"
+            amount={`KSh ${totalExpenses.toLocaleString()}`}
+          />
 
 
-          {/* Current balance */}
+          {/* Balance or deficit */}
           <SummaryCard
-  title={hasDeficit ? "Deficit" : "Balance"}
-  amount={`KSh ${Math.abs(balance).toLocaleString()}`}
-/>
+            title={hasDeficit ? "Deficit" : "Balance"}
+            amount={`KSh ${Math.abs(balance).toLocaleString()}`}
+          />
 
         </section>
 
-        {/* Allow the user to set their monthly income */}
-<IncomeForm
-  setMonthlyIncome={setMonthlyIncome}
-  currentIncome={monthlyIncome}
-/>
 
+        {/* ==================================
+            MONTHLY OVERVIEW
+        ================================== */}
+
+        <section>
+
+          <h2>Monthly Overview</h2>
+
+
+          {/* Month selector */}
+          <label>
+            Select Month:
+          </label>
+
+
+          <input
+            type="month"
+
+            // Show the currently selected month.
+            value={selectedMonth}
+
+            // Update the selected month whenever
+            // the user chooses another month.
+            onChange={(event) =>
+              setSelectedMonth(event.target.value)
+            }
+          />
+
+
+          {/* Display the selected month */}
+          <p>
+            Selected Month: {selectedMonth}
+          </p>
+
+
+          {/* Display monthly spending */}
+          <p>
+            Monthly Spending: KSh{" "}
+            {monthlyTotal.toLocaleString()}
+          </p>
+
+
+          {/* Display monthly balance */}
+          <p>
+            Monthly Balance: KSh{" "}
+            {monthlyBalance.toLocaleString()}
+          </p>
+
+        </section>
+
+
+        {/* ==================================
+            CATEGORY ANALYSIS
+        ================================== */}
+
+        <section>
+
+          <h2>Spending by Category</h2>
+
+
+          {/* 
+            Object.entries() converts our category
+            totals object into an array.
+
+            Example:
+
+            {
+              Food: 5000,
+              Rent: 8500
+            }
+
+            becomes:
+
+            [
+              ["Food", 5000],
+              ["Rent", 8500]
+            ]
+
+            We can then use .map() to display
+            each category.
+          */}
+
+          {Object.entries(categoryTotals).map(
+            ([category, total]) => {
+
+              // Calculate what percentage of the
+              // month's spending belongs to this
+              // particular category.
+              //
+              // Example:
+              //
+              // Food = 5,000
+              // Monthly total = 20,000
+              //
+              // 5,000 / 20,000 * 100
+              // = 25%
+              const percentage =
+                monthlyTotal > 0
+                  ? (total / monthlyTotal) * 100
+                  : 0;
+
+
+              // Return the category information.
+              return (
+                <div key={category}>
+
+                  {/* Category name */}
+                  <p>
+                    <strong>{category}</strong>
+                  </p>
+
+
+                  {/* Amount spent */}
+                  <p>
+                    KSh {total.toLocaleString()}
+                  </p>
+
+
+                  {/* Percentage of monthly spending */}
+                  <p>
+                    {percentage.toFixed(1)}% of monthly spending
+                  </p>
+
+                </div>
+              );
+            }
+          )}
+
+        </section>
+
+
+        {/* ==================================
+            INCOME FORM
+        ================================== */}
 
         {/* 
-          ExpenseForm receives setExpenses as a prop.
+          Allow the user to set or update
+          their monthly income.
+        */}
+        <IncomeForm
+          setMonthlyIncome={setMonthlyIncome}
+          currentIncome={monthlyIncome}
+        />
 
-          This allows ExpenseForm to add new expenses
-          to the expenses state that belongs to App.
+
+        {/* ==================================
+            EXPENSE FORM
+        ================================== */}
+
+        {/* 
+          ExpenseForm receives setExpenses
+          as a prop.
+
+          This allows ExpenseForm to add new
+          expenses to the expenses state.
         */}
         <ExpenseForm
           setExpenses={setExpenses}
         />
 
+
+        {/* ==================================
+            EXPENSE LIST
+        ================================== */}
+
         {/* 
-  Pass our expenses state to ExpenseList.
+          Pass expenses to ExpenseList.
 
-  ExpenseList will use this data to display
-  every expense on the screen.
-*/}
-<ExpenseList 
-expenses={expenses}
-onDelete={handleDelete}
- />
+          ExpenseList displays every expense
+          on the screen.
 
+          onDelete allows ExpenseList to tell
+          App which expense should be deleted.
+        */}
+        <ExpenseList
+          expenses={expenses}
+          onDelete={handleDelete}
+        />
 
       </main>
 
