@@ -1,18 +1,37 @@
+// Import the Navbar component from our components folder.
+import Navbar from "./components/Navbar";
+
+// Import the SummaryCard component.
+import SummaryCard from "./components/SummaryCard";
+
 // App is the main component of our application.
-// Think of a component as a reusable piece of the user interface.
 function App() {
-  // Everything returned inside here is what React will display
-  // on the browser screen.
   return (
     <div>
-      {/* This is the main heading of our application */}
-      <h1>Personal Expense Tracker</h1>
+      {/* Display our navigation bar */}
+      <Navbar />
 
-      {/* This paragraph explains what the application does */}
-      <p>Track your income, expenses and monthly spending.</p>
+      {/* Main content of our application */}
+      <main>
+        <h1>Financial Dashboard</h1>
+
+        <p>Welcome to your personal expense tracker.</p>
+
+        {/* Container for our financial summary */}
+        <section>
+          {/* We can reuse the same component */}
+          <SummaryCard />
+
+          {/* Another SummaryCard */}
+          <SummaryCard />
+
+          {/* And another one */}
+          <SummaryCard />
+        </section>
+      </main>
     </div>
   );
 }
 
-// We export App so that other files can use this component.
+// Export App so React can use it.
 export default App;

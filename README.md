@@ -1,10 +1,10 @@
-# Personal Expense Tracker
+# PesaLens
 
-A personal expense tracking and financial analytics application built with React.
+A personal financial tracking and analytics dashboard built with React.
 
 ## Project Goal
 
-The goal of this project is to create an application that helps me understand my monthly spending.
+PesaLens helps me understand where my money goes by tracking my income, expenses, monthly spending and financial performance.
 
 The application will allow me to:
 
@@ -15,6 +15,7 @@ The application will allow me to:
 - Calculate monthly surplus or deficit
 - Identify my highest spending categories
 - Identify my highest spending months
+- Compare spending between months
 - Analyze spending patterns
 
 ## Technologies
