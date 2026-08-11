@@ -52,6 +52,26 @@ function App() {
   // 2026-08 = August 2026
   const [selectedMonth, setSelectedMonth] = useState("2026-08");
 
+  // ==========================================
+// PREVIOUS MONTH
+// ==========================================
+
+// Convert the selected month into a Date object.
+const currentMonthDate = new Date(`${selectedMonth}-01`);
+
+// Create a date representing the previous month.
+const previousMonthDate = new Date(currentMonthDate);
+
+previousMonthDate.setMonth(
+  previousMonthDate.getMonth() - 1
+);
+
+// Convert the previous month back into
+// the YYYY-MM format used by our expenses.
+const previousMonth = previousMonthDate
+  .toISOString()
+  .slice(0, 7);
+
 
   // ==========================================
   // MONTHLY EXPENSES
@@ -65,6 +85,18 @@ function App() {
 
 
   // ==========================================
+// PREVIOUS MONTH EXPENSES
+// ==========================================
+
+// Get only the expenses belonging to
+// the previous month.
+const previousMonthExpenses = expenses.filter(
+  (expense) =>
+    expense.date.startsWith(previousMonth)
+);
+
+
+  // ==========================================
   // MONTHLY TOTAL
   // ==========================================
 
@@ -74,6 +106,40 @@ function App() {
     (total, expense) => total + expense.amount,
     0
   );
+
+  // ==========================================
+// PREVIOUS MONTH TOTAL
+// ==========================================
+
+// Calculate how much was spent during
+// the previous month.
+const previousMonthTotal = previousMonthExpenses.reduce(
+  (total, expense) => total + expense.amount,
+  0
+);
+
+// ==========================================
+// SPENDING DIFFERENCE
+// ==========================================
+
+// Calculate the difference between this month's
+// spending and the previous month's spending.
+const spendingDifference =
+  monthlyTotal - previousMonthTotal;
+
+  // ==========================================
+// SPENDING PERCENTAGE CHANGE
+// ==========================================
+
+// Calculate how much spending changed
+// compared to the previous month.
+//
+// We only calculate this if the previous
+// month had some spending.
+const spendingPercentageChange =
+  previousMonthTotal > 0
+    ? (spendingDifference / previousMonthTotal) * 100
+    : 0;
 
 
   // ==========================================
@@ -406,6 +472,79 @@ const incomeUsedPercentage =
     <p>
       ✅ Your spending is currently
       below 50% of your income.
+    </p>
+
+  )}
+
+</section>
+
+{/* ==================================
+    MONTH-TO-MONTH COMPARISON
+================================== */}
+
+<section>
+
+  <h2>Monthly Comparison</h2>
+
+  {/* Previous month's spending */}
+  <p>
+    Previous Month Spending:
+    KSh {previousMonthTotal.toLocaleString()}
+  </p>
+
+
+  {/* Current month's spending */}
+  <p>
+    Current Month Spending:
+    KSh {monthlyTotal.toLocaleString()}
+  </p>
+
+
+  {/* Difference between the two months */}
+  <p>
+    Difference:
+    KSh {Math.abs(spendingDifference).toLocaleString()}
+  </p>
+
+
+  {/* Display percentage change */}
+  <p>
+    Percentage Change:
+    {Math.abs(spendingPercentageChange).toFixed(1)}%
+  </p>
+
+
+  {/* ==================================
+      COMPARISON MESSAGE
+  ================================== */}
+
+  {previousMonthTotal === 0 ? (
+
+    <p>
+      ℹ️ There is no spending data for
+      the previous month yet.
+    </p>
+
+  ) : spendingDifference > 0 ? (
+
+    <p>
+      📈 You spent{" "}
+      {Math.abs(spendingPercentageChange).toFixed(1)}%
+      more this month than last month.
+    </p>
+
+  ) : spendingDifference < 0 ? (
+
+    <p>
+      📉 You spent{" "}
+      {Math.abs(spendingPercentageChange).toFixed(1)}%
+      less this month than last month.
+    </p>
+
+  ) : (
+
+    <p>
+      ➖ Your spending is the same as last month.
     </p>
 
   )}
