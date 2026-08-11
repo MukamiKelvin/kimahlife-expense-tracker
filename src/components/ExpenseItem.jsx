@@ -1,9 +1,9 @@
 // ExpenseItem represents ONE expense.
 //
-// Instead of displaying all expenses,
-// this component is responsible for displaying
-// a single expense.
-function ExpenseItem({ expense }) {
+// onDelete is a function that we receive from
+// the parent component. We will call this function
+// when the user clicks the Delete button.
+function ExpenseItem({ expense, onDelete }) {
 
   return (
     <div>
@@ -16,6 +16,17 @@ function ExpenseItem({ expense }) {
 
       {/* Expense category */}
       <p>{expense.category}</p>
+
+      {/* 
+        When the user clicks this button,
+        call the onDelete function.
+
+        We pass the expense ID so the parent
+        knows exactly which expense to delete.
+      */}
+      <button onClick={() => onDelete(expense.id)}>
+        Delete
+      </button>
 
     </div>
   );

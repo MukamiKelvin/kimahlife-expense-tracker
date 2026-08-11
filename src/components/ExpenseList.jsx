@@ -1,8 +1,13 @@
 // Import ExpenseItem.
+// ExpenseItem is responsible for displaying
+// one individual expense.
 import ExpenseItem from "./ExpenseItem";
 
 // ExpenseList displays all expenses.
-function ExpenseList({ expenses }) {
+//
+// expenses = our list of expenses.
+// onDelete = function used to delete an expense.
+function ExpenseList({ expenses, onDelete }) {
 
   return (
     <div>
@@ -11,22 +16,37 @@ function ExpenseList({ expenses }) {
       <h2>Recent Expenses</h2>
 
       {/* 
-        Loop through every expense.
-
-        For every expense, create an ExpenseItem.
+        Check whether we have any expenses.
+        
+        If there are expenses, display them.
+        Otherwise, display a message.
       */}
-      <div>
+      {expenses.length > 0 ? (
 
-        {expenses.map((expense) => (
+        <div>
 
-          <ExpenseItem
-            key={expense.id}
-            expense={expense}
-          />
+          {/* 
+            map() goes through every expense
+            and creates an ExpenseItem.
+          */}
+          {expenses.map((expense) => (
 
-        ))}
+            <ExpenseItem
+              key={expense.id}
+              expense={expense}
+              onDelete={onDelete}
+            />
 
-      </div>
+          ))}
+
+        </div>
+
+      ) : (
+
+        // This appears when there are no expenses.
+        <p>No expenses recorded yet.</p>
+
+      )}
 
     </div>
   );

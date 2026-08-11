@@ -27,6 +27,21 @@ function App() {
   // added any expenses yet.
   const [expenses, setExpenses] = useState([]);
 
+  // This function deletes an expense.
+//
+// It receives the ID of the expense
+// we want to remove.
+function handleDelete(expenseId) {
+
+  // Create a new array containing every expense
+  // EXCEPT the one whose ID matches expenseId.
+  setExpenses((previousExpenses) =>
+    previousExpenses.filter(
+      (expense) => expense.id !== expenseId
+    )
+  );
+}
+
 
   return (
     <div>
@@ -89,7 +104,10 @@ function App() {
   ExpenseList will use this data to display
   every expense on the screen.
 */}
-<ExpenseList expenses={expenses} />
+<ExpenseList 
+expenses={expenses}
+onDelete={handleDelete}
+ />
 
 
       </main>
