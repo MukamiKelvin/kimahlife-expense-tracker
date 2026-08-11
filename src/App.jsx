@@ -516,7 +516,10 @@ function App() {
           MAIN DASHBOARD
       ================================== */}
 
-      <main className="dashboard">
+      <main
+  className="dashboard"
+  id="dashboard"
+>
 
 
         {/* ==================================
@@ -679,7 +682,7 @@ function App() {
     MONTHLY OVERVIEW
 ================================== */}
 
-<section className="dashboard-section monthly-overview">
+<section className="dashboard-section monthly-overview" id="analytics">
 
   {/* Section heading */}
   <div className="section-header">
@@ -1359,7 +1362,7 @@ function App() {
             EXPENSE FORM
         ================================== */}
 
-        <section className="dashboard-section">
+        <section className="dashboard-section" id="expenses">
 
 
           <ExpenseForm
@@ -1429,6 +1432,30 @@ function App() {
 
 
       </main>
+
+      {/* ==================================
+          FOOTER
+      ================================== */}
+
+      <footer className="footer">
+
+        <p>
+          © 2026 KimSpend. All rights reserved.
+        </p>
+
+        <p>
+  Built by{" "}
+  <a
+    href="https://www.linkedin.com/in/kelvin-kimanthi-mukami-60bb19241/"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    Mukami Kelvin
+  </a>
+</p>
+
+      </footer>
+
 
 
     </div>

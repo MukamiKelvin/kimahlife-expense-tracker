@@ -1,48 +1,37 @@
-// Navbar is the navigation bar
-// displayed at the top of KimSpend.
-
 function Navbar() {
-
   return (
-
     <nav className="navbar">
 
-      {/* KimSpend brand */}
+      {/* Brand */}
       <div className="navbar-brand">
-
         <span className="brand-name">
           KimSpend
         </span>
 
         <span className="brand-tagline">
-          Smart money tracking
+          Smart Money Tracking
         </span>
-
       </div>
 
-
-      {/* Navigation links */}
+      {/* Navigation */}
       <div className="navbar-links">
 
-        <a href="#">
+        <a href="#dashboard">
           Dashboard
         </a>
 
-        <a href="#">
-          Expenses
+        <a href="#analytics">
+          Analytics
         </a>
 
-        <a href="#">
-          Analytics
+        <a href="#expenses">
+          Expenses
         </a>
 
       </div>
 
     </nav>
-
   );
 }
 
-
-// Export Navbar so App.jsx can use it.
 export default Navbar;

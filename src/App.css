@@ -3680,3 +3680,68 @@ button:hover {
   }
 
 }
+
+/* =========================================
+   SMOOTH NAVIGATION
+========================================= */
+
+html {
+  scroll-behavior: smooth;
+}
+
+/*
+   Prevent the navbar from covering
+   the section heading when scrolling.
+*/
+
+#dashboard,
+#analytics,
+#expenses {
+  scroll-margin-top: 100px;
+}
+
+/* =========================================
+   FOOTER
+========================================= */
+
+.footer {
+  margin-top: 40px;
+  padding: 28px 24px;
+  border-top: 1px solid #e2e8f0;
+  text-align: center;
+  background-color: #ffffff;
+}
+
+.footer p {
+  margin: 4px 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.footer a {
+  color: #059669;
+  font-weight: 700;
+  text-decoration: none;
+  transition: 0.2s ease;
+}
+
+.footer a:hover {
+  color: #047857;
+  text-decoration: underline;
+}
+
+/* =========================================
+   MOBILE FOOTER
+========================================= */
+
+@media (max-width: 768px) {
+
+  .footer {
+    padding: 24px 16px;
+  }
+
+  .footer p {
+    font-size: 12px;
+  }
+
+}
