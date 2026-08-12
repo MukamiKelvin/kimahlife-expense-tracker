@@ -1,10 +1,10 @@
-# PesaLens
+# KimSpend
 
 A personal financial tracking and analytics dashboard built with React.
 
 ## Project Goal
 
-PesaLens helps me understand where my money goes by tracking my income, expenses, monthly spending and financial performance.
+KimSpend helps me understand where my money goes by tracking my income, expenses, monthly spending and financial performance.
 
 The application will allow me to:
 
@@ -29,7 +29,7 @@ The application will allow me to:
 
 ## Current Status
 
-🚧 Project is currently under development.
+🚧 Version 1.0 Completed.
 
 ## Author
 
